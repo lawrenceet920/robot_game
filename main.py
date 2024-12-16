@@ -55,7 +55,19 @@ game_time = {
 }
 scrap = 0
 player_name = input('What is your name: ')
-
+# Bot
+player_bots = {
+    'bot1' : 'Empty Slot'
+    'bot2' : 'Empty Slot'
+    'bot3' : 'Empty Slot'
+    'bot4' : 'Empty Slot'
+    'bot5' : 'Empty Slot'
+    'bot6' : 'Empty Slot'
+    'bot7' : 'Empty Slot'
+    'bot8' : 'Empty Slot'
+    'bot9' : 'Empty Slot'
+    'bot10' : 'Empty Slot'
+}
 print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of robots.')
 print('You have made it 50 miles deep into enemy territory and will make your stand here, you go to bed, your elite team by your side, you are ready!')
 time.sleep(1)
@@ -67,9 +79,13 @@ while True:
     question = input('Awaiting imput: ')
     if question == '1':
         gain_scrap(500)
+        break
     elif question == '2':
-        print('utility')
+        random_champion()
+        break
     elif question == '3':
-        print('champion')
+        random_utility()
+        break
     else:
         print('Invalid input, type 1, 2 or 3.')
+
