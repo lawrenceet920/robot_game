@@ -2,6 +2,7 @@
 # Robot game
 # Dec 13 2024
 import time
+import random
 """
 Plan:
 Build and upgrade your bots
@@ -39,6 +40,14 @@ if hit it high damage cause bot malfunction (lower stats and systems offline)"""
 def gain_scrap(amount):
     global scrap
     print(f'+ {amount} scrap | you now have {scrap}')
+def random_utility():
+    '''Generates a random utility part from list'''
+    rand = random.randint(1,10)
+    return rand
+def random_champion():
+    '''Generates a random champion part from list'''
+    rand = random.randint(1,10)
+    return rand
 game_time = {
     'day' : 1,
     'hour' : 1,
@@ -46,6 +55,7 @@ game_time = {
 }
 scrap = 0
 player_name = input('What is your name: ')
+
 print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of robots.')
 print('You have made it 50 miles deep into enemy territory and will make your stand here, you go to bed, your elite team by your side, you are ready!')
 time.sleep(1)
