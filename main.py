@@ -77,47 +77,170 @@ def build_bot():
         else:
             selected_bot = f'bot{question}'
             question = input(f'What is bot{question}\'s name: ')
-            health = 100
-            armor = 10
-            damage = 50
-            support = 50
-            energy = health + (armor * 10)
+            cost = 100
+
+            chasis = select_chasis()
+            cost += chasis['cost']
+
+            core = select_core()
+            cost += core['cost']
+
+            engine = select_engine()
+            cost += cost
+            
             bot_loadout = {
-                'max_hp' : health,
-                'hp' : health,
-                'armor' : armor,
-                'damage' : damage,
-                'support' : support,
-                'energy' : energy,
+                'max_hp' : chasis['health'],
+                'hp' : chasis['health'],
+                'armor' : chasis['armor'],
+                'power' : engine['power'],
+                'speed' : engine['speed'],
+                'energy' : core['energy'],
             }
+
+            print(cost)
+            print(f'{chasis} : {core} : {engine}')
             player_bots[selected_bot] = bot_loadout
     # End of build bot
 # Selecting bot parts
 def select_chasis():
-    print('Select a "Chasis", this will determine base stats.')
+    print('Select a "Chasis", this will determine base defencive stats.')
     chasis = {
-    '1' : {
-        'material' : 'Wooden',
-        'cost' : 50
+    'Wooden' : {
+        'type' : '1',
+        'cost' : 50,
+        'armor' : 0,
+        'health' : 100
     },
-    '2' : 'Stone',
-    '3' : 'Scrap Iron',
-    '4' : 'Iron',
-    '5' : 'Steel',
-    '6' : 'Titainium'
+    'Stone' : {
+        'type' : '2',
+        'cost' : 75,
+        'armor' : 10,
+        'health' : 100
+    },
+    'Scrap Iron' : {
+        'type' : '3',
+        'cost' : 150,
+        'armor' : 15,
+        'health' : 250
+    },
+    'Glass' : {
+        'type' : '4',
+        'cost' : 150,
+        'armor' : 100,
+        'health' : 1
+    },
+    'Iron' : {
+        'type' : '5',
+        'cost' : 250,
+        'armor' : 25,
+        'health' : 500
+    },
+    'Steel' : {
+        'type' : '6',
+        'cost' : 500,
+        'armor' : 50,
+        'health' : 1000
+    }
     }
     time.sleep(1)
     for option in chasis:
-        print(f'{option} : {chasis[option]['material']} : {chasis[option]['cost']}')
+        input = chasis[option]['type']
+        cost = chasis[option]['cost']
+        print(f'{input} : {option} : {cost} Scrap')
     while True:
         question = input('Awaiting imput: ')
         if question in chasis:
-            break
+            return option
         else:
             print('Enter a number.')
-    
-
-select_chasis()
+    # End of select chasis
+def select_core():
+    print('Select a "Core", this will determine avalible energy.')
+    core = {
+    'Copper Battery' : {
+        'type' : '1',
+        'cost' : 5,
+        'energy' : 50
+    },
+    'Car Battery' : {
+        'type' : '2',
+        'cost' : 50,
+        'energy' : 100
+    },
+    'Carbon' : {
+        'type' : '3',
+        'cost' : 100,
+        'energy' : 250
+    },
+    'Green' : {
+        'type' : '4',
+        'cost' : 200,
+        'energy' : 500
+    },
+    'Hydrogen' : {
+        'type' : '5',
+        'cost' : 500,
+        'energy' : 1000
+    }
+    }
+    time.sleep(1)
+    for option in core:
+        input = core[option]['type']
+        cost = core[option]['cost']
+        print(f'{input} : {option} : {cost} Scrap')
+    while True:
+        question = input('Awaiting imput: ')
+        if question in core:
+            return option
+        else:
+            print('Enter a number.')
+    # End of select core
+def select_engine():
+    print('Select a "Engine", this will determine attack, support, and speed stats.')
+    engine = {
+    'Toy' : {
+        'type' : '1',
+        'cost' : 5,
+        'power' : 20,
+        'speed' : 20
+    },
+    'Car' : {
+        'type' : '2',
+        'cost' : 50,
+        'power' : 100,
+        'speed' : 50
+    },
+    'Racecar' : {
+        'type' : '3',
+        'cost' : 100,
+        'power' : 75,
+        'speed' : 200
+    },
+    'Truck' : {
+        'type' : '4',
+        'cost' : 200,
+        'power' : 200,
+        'speed' : 25
+    },
+    'Jet' : {
+        'type' : '5',
+        'cost' : 500,
+        'power' : 200,
+        'speed' : 200
+    }
+    }
+    time.sleep(1)
+    for option in engine:
+        input = engine[option]['type']
+        cost = engine[option]['cost']
+        print(f'{input} : {option} : {cost} Scrap')
+    while True:
+        question = input('Awaiting imput: ')
+        if question in engine:
+            return option
+        else:
+            print('Enter a number.')
+    # End of select engine
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -127,18 +250,7 @@ game_time = {
 main_loop = True
 scrap = 0
 # Bots
-player_bots = {
-    'bot1' : 'Empty Slot',
-    'bot2' : 'Empty Slot',
-    'bot3' : 'Empty Slot',
-    'bot4' : 'Empty Slot',
-    'bot5' : 'Empty Slot',
-    'bot6' : 'Empty Slot',
-    'bot7' : 'Empty Slot',
-    'bot8' : 'Empty Slot',
-    'bot9' : 'Empty Slot',
-    'bot10' : 'Empty Slot'
-}
+player_bots = {}
 
 # Game start
 player_name = input('What is your name: ')
