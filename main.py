@@ -71,17 +71,17 @@ def random_champion():
 def build_bot():
     building = True
     while building:
-        question = 'What slot do you with to build in? (example: 5)\n'
+        question = input('What slot do you with to build in? (example: 5)\n')
         if int(question) not in range(1, 11):
             print('Please enter a number between 1 and 10')
         else:
             selected_bot = f'bot{question}'
-
+            question = input(f'What is bot{question}\'s name: ')
             health = 100
             armor = 10
             damage = 50
             support = 50
-            energy_cost = health + (armor * 10)
+            energy = health + (armor * 10)
             bot_loadout = {
                 'max_hp' : health,
                 'hp' : health,
@@ -92,6 +92,32 @@ def build_bot():
             }
             player_bots[selected_bot] = bot_loadout
     # End of build bot
+# Selecting bot parts
+def select_chasis():
+    print('Select a "Chasis", this will determine base stats.')
+    chasis = {
+    '1' : {
+        'material' : 'Wooden',
+        'cost' : 50
+    },
+    '2' : 'Stone',
+    '3' : 'Scrap Iron',
+    '4' : 'Iron',
+    '5' : 'Steel',
+    '6' : 'Titainium'
+    }
+    time.sleep(1)
+    for option in chasis:
+        print(f'{option} : {chasis[option]['material']} : {chasis[option]['cost']}')
+    while True:
+        question = input('Awaiting imput: ')
+        if question in chasis:
+            break
+        else:
+            print('Enter a number.')
+    
+
+select_chasis()
 # --- Variables --- #
 game_time = {
     'day' : 1,
