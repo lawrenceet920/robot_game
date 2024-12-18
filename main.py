@@ -63,12 +63,18 @@ def random_utility():
     rand = random.randint(1,10)
     return rand
     # End of random utility
-
+def random_weapon():
+    '''Generates a random weapon part from list'''
+    rand = random.randint(1,10)
+    return rand
+    # End of random utility
 def random_champion():
     '''Generates a random champion part from list'''
     rand = random.randint(1,10)
     return rand
     # End of random champion
+
+# - - - - - - - - - - - - - - - - - - - - -#- BUILD BOT -#- - - - - - - - - - - - - - - - - - - - - #
 
 def build_bot():
     global scrap
@@ -88,6 +94,9 @@ def build_bot():
     cost += engine['cost']
     print()
 
+    specialty = select_specialty()
+    print()
+
     name = input('Name your bot:    ')
     bot_loadout = {
         'name' : name,
@@ -96,9 +105,20 @@ def build_bot():
         'armor' : chasis['armor'],
         'power' : engine['power'],
         'energy' : core['energy'],
+        'specialty' : specialty,
+        'parts' : {}
     }
 
-    print(f"Chasis : {chasis['material']} | Core : {core['material']} | Engine : {engine['material']} | for {cost} scrap")
+    print(f"This robot specialises in {specialty} and is will use these parts")
+    print(f"Chasis : {chasis['material']} | Core : {core['material']} | Engine : {engine['material']}")
+    if specialty == 'Swarmer':
+        cost -= cost / 2
+    elif specialty == 'Striker':
+        bot_loadout['power'] = bot_loadout['power'] * 1.5
+    elif specialty == 'Defender':
+        bot_loadout['health'] = bot_loadout['health'] * 2
+        bot_loadout['armor'] = bot_loadout['armor'] + 10
+
     if scrap >= cost:
         print('Type y to build the robot?')
         question = input('Awaiting input: ')
@@ -156,7 +176,7 @@ def select_chasis():
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in ['1', '2', '3', '4', '5', '6']:
+        if question in chasis:
             chasis = {
                 'material' : chasis[question]['material'],
                 'cost' : chasis[question]['cost'],
@@ -204,7 +224,7 @@ def select_core():
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in ['1', '2', '3', '4', '5']:
+        if question in core:
             core = {
                 'material' : core[question]['material'],
                 'cost' : core[question]['cost'],
@@ -251,7 +271,7 @@ def select_engine():
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in ['1', '2', '3', '4', '5']:
+        if question in engine:
             engine = {
                 'material' : engine[question]['material'],
                 'cost' : engine[question]['cost'],
@@ -261,6 +281,21 @@ def select_engine():
         else:
             print('Enter a number.')
     # End of select engine
+def select_specialty():
+    print('Bot specialty determines what a bot is made to do. But any bot can be any specialty.')
+    specialties = {
+    '1' : 'Striker', # Higher damage
+    '2' : 'Defender', # Better armor and health
+    '3' : 'Support', # Additional bot part slots
+    '4' : 'Champion', # Allows champion parts to be equiped
+    '5' : 'Swarmer' # Cheaper
+    }
+    question = input('Awaiting input: ')
+    if question in specialties:
+        specialty = specialties[question]
+        return specialty
+    else:
+        print('Enter a number.')
 
 def install_part():
     print(f"Pick a robot: {list_bots()}, or type 'quit' to quit (Capitalisation matters)")
@@ -268,12 +303,68 @@ def install_part():
     if question in ['quit', 'Quit', 'QUIT']:
         return
     elif question in player_bots:
-        selected_bot = player_bots[question]
-        print(f"You are installing parts in: {question}")
+        selected_bot = player_bots[question] # Bot found
+        specialty = selected_bot['specialty'] # Specialty found
+        if specialty == 'Support': # Support?
+            allowed_parts = 6
+        else: 
+            allowed_parts = 4
+        if specialty == 'Champion': # Champion?
+            champ = True
+        else:
+            champ = False
+        
+        print(f"You are installing parts in: {question}. Specialty : {specialty}")
+        total_parts = 0 # Find part count
+        if selected_bot['parts']: # Empty dict is false
+            for part in selected_bot['parts']:
+                total_parts += 1
+        else:
+            total_parts = 0
 
-        for item in selected_bot:
-            if item in ['Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6']:
-                print(item)
+        installing = True
+        while installing:
+            if total_parts < allowed_parts:
+                print('Current owned parts: ')
+                if champion_parts and champ: # List parts
+                    print('\nChampion Part List:')
+                    for part in champion_parts:
+                        print(part)
+                if weapon_parts:
+                    print('\nWeapon Part List:')
+                    for part in weapon_parts:
+                        print(part)
+                if utility_parts:
+                    print('\nUtility Part List:')
+                    for part in utility_parts:
+                        print(part)
+                # Stop listing
+                print() 
+                print(f'Do you wish to install a part into {selected_bot}, \n current parts:')
+                for part in selected_bot['parts']:
+                    print(part)
+                question = input('Awaiting input: ')
+                if question.lower in ['y', 'yes']:
+                    while installing:
+                        print('Type in the part you want to install, or "quit" to quit.')
+                        question = input('Awaiting input: ')
+                        if question.lower == 'quit':
+                            installing = False
+                        elif question in selected_bot['parts']:
+                            print('Part is already in the bot.')
+                        elif question in [champion_parts, utility_parts, weapon_parts]:
+                            print('Part found! installing...')
+                            if champ:
+                                for selected_part in champion_parts:
+                                    if selected_part == question:
+                                        champion_parts.remove(selected_part)
+                                        selected_bot['parts'][selected_part]
+                        else:
+                            print('part not found.')
+                else:
+                    installing = False
+        else:
+            print('Exiting')
     # End Of installing parts
 def next_event():
     global game_time
@@ -326,6 +417,7 @@ def list_bots():
     for bot in player_bots:
         names.append(bot)
     return names
+
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -336,7 +428,9 @@ main_loop = True
 scrap = 0
 # Bots
 player_bots = {}
-
+utility_parts = []
+weapon_parts = []
+champion_parts = []
 # Game start
 player_name = input('What is your name: ')
 # print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of robots.')
