@@ -88,7 +88,9 @@ def build_bot():
     cost += engine['cost']
     print()
 
+    question = input('Name your bot:    ')
     bot_loadout = {
+        'name' : question,
         'max_hp' : chasis['health'],
         'hp' : chasis['health'],
         'armor' : chasis['armor'],
@@ -102,8 +104,7 @@ def build_bot():
         print('Type y to build the robot?')
         question = input('Awaiting input: ')
         if question in ['y', 'Y', 'Yes', 'yes']:
-            question = input('Name your bot:    ')
-            player_bots[question] = bot_loadout
+            player_bots[bot_loadout]['name'] = bot_loadout
     print('Exiting build mode.')
     get_time()
     # End of build bot
@@ -267,6 +268,48 @@ def select_engine():
         else:
             print('Enter a number.')
     # End of select engine
+def next_event():
+    global game_time
+    events = ['Build bot', 'Scavange for resources']
+    if game_time['hour'] >= 19:
+        events.append('Sleep')
+
+    get_time()
+    print('\nWhat do you do now?')
+    counter = 0
+    for event in events:
+        counter += 1
+        print(f'{counter} : {event}')
+    while True:
+        question = input('Awaiting input: ')
+        if question.isdigit():
+            if int(question) <= len(events):
+                question = events[int(question) - 1]
+                break
+            else:
+                print('Please enter a number listed by an event')
+        else:
+            print('Please type a number.')
+    print()
+    if question == 'Build bot':
+        build_bot()
+    elif question == 'Scavange for resources':
+        print('You scavenge for resources and look for? \n 1: 500 scrap \n 2: random utility part \n 3: random champion part')
+        scavenge()
+def scavenge():
+    while True:
+        question = input('Awaiting input: ')
+        if question == '1':
+            gain_scrap(500)
+            break
+        elif question == '2':
+            random_champion()
+            break
+        elif question == '3':
+            random_utility()
+            break
+        else:
+            print('Invalid input, material 1, 2 or 3.')
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -291,24 +334,11 @@ player_name = input('What is your name: ')
 gain_scrap(1000)
 # time.sleep(0.5)
 print('\nWhat do you use your destroyed force for? \n 1: 500 scrap \n 2: random utility part \n 3: random champion part')
-while True:
-    question = input('Awaiting input: ')
-    if question == '1':
-        gain_scrap(500)
-        break
-    elif question == '2':
-        random_champion()
-        break
-    elif question == '3':
-        random_utility()
-        break
-    else:
-        print('Invalid input, material 1, 2 or 3.')
+scavenge()
 
 while main_loop:
-    get_time()
-    build_bot()
-    print(player_bots)
-    question = input('Oops! you made it to the end of the current build! quit?')
+    next_event()
+    print(player_bots.keys())
+    question = input('Oops! you made it to the end of the current build! quit?\n')
     if question == 'quit':
         break
