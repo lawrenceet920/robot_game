@@ -88,14 +88,13 @@ def build_bot():
     cost += engine['cost']
     print()
 
-    question = input('Name your bot:    ')
+    name = input('Name your bot:    ')
     bot_loadout = {
-        'name' : question,
+        'name' : name,
         'max_hp' : chasis['health'],
         'hp' : chasis['health'],
         'armor' : chasis['armor'],
         'power' : engine['power'],
-        'speed' : engine['speed'],
         'energy' : core['energy'],
     }
 
@@ -104,7 +103,7 @@ def build_bot():
         print('Type y to build the robot?')
         question = input('Awaiting input: ')
         if question in ['y', 'Y', 'Yes', 'yes']:
-            player_bots[bot_loadout]['name'] = bot_loadout
+            player_bots[name] = bot_loadout
     print('Exiting build mode.')
     get_time()
     # End of build bot
@@ -216,37 +215,32 @@ def select_core():
             print('Enter a number.')
     # End of select core
 def select_engine():
-    print('Select a "Engine", this will determine attack, support, and speed stats.')
+    print('Select a "Engine", this will determine attack and support stats.')
     engine = {
     '1' : {
         'material' : 'Toy',
         'cost' : 5,
-        'power' : 20,
-        'speed' : 20
+        'power' : 20
     },
     '2' : {
         'material' : 'Car',
         'cost' : 50,
-        'power' : 100,
-        'speed' : 50
+        'power' : 100
     },
     '3' : {
         'material' : 'Racecar',
         'cost' : 100,
-        'power' : 75,
-        'speed' : 200
+        'power' : 150
     },
     '4' : {
         'material' : 'Truck',
         'cost' : 200,
-        'power' : 200,
-        'speed' : 25
+        'power' : 200
     },
     '5' : {
         'material' : 'Jet',
         'cost' : 500,
-        'power' : 200,
-        'speed' : 200
+        'power' : 250
     }
     }
     time.sleep(1)
@@ -262,18 +256,32 @@ def select_engine():
                 'material' : engine[question]['material'],
                 'cost' : engine[question]['cost'],
                 'power' : engine[question]['power'],
-                'speed' : engine[question]['speed']
             }
             return engine
         else:
             print('Enter a number.')
     # End of select engine
+
+def install_part():
+    print(f"Pick a robot: {list_bots()}, or type 'quit' to quit (Capitalisation matters)")
+    question = input('Awaiting input: ')
+    if question in ['quit', 'Quit', 'QUIT']:
+        return
+    elif question in player_bots:
+        selected_bot = player_bots[question]
+        print(f"You are installing parts in: {question}")
+
+        for item in selected_bot:
+            if item in ['Slot 1', 'Slot 2', 'Slot 3', 'Slot 4', 'Slot 5', 'Slot 6']:
+                print(item)
+    # End Of installing parts
 def next_event():
     global game_time
     events = ['Build bot', 'Scavange for resources']
     if game_time['hour'] >= 19:
         events.append('Sleep')
-
+    if len(player_bots) >= 1:
+        events.append('Install bot parts')
     get_time()
     print('\nWhat do you do now?')
     counter = 0
@@ -296,6 +304,8 @@ def next_event():
     elif question == 'Scavange for resources':
         print('You scavenge for resources and look for? \n 1: 500 scrap \n 2: random utility part \n 3: random champion part')
         scavenge()
+    elif question == 'Install bot parts':
+        install_part()
 def scavenge():
     while True:
         question = input('Awaiting input: ')
@@ -310,6 +320,12 @@ def scavenge():
             break
         else:
             print('Invalid input, material 1, 2 or 3.')
+def list_bots():
+    global player_bots
+    names = []
+    for bot in player_bots:
+        names.append(bot)
+    return names
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -338,7 +354,7 @@ scavenge()
 
 while main_loop:
     next_event()
-    print(player_bots.keys())
+    print(f'Your bots: {list_bots()}')
     question = input('Oops! you made it to the end of the current build! quit?\n')
     if question == 'quit':
         break
