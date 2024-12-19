@@ -37,6 +37,8 @@ other team does random action
 both actions execute based on bot speed
 bots take damage and could break or need repairs
 if hit it high damage cause bot malfunction (lower stats and systems offline)"""
+
+
 def gain_scrap(amount):
     global scrap
     scrap += amount
@@ -168,7 +170,6 @@ def select_chasis():
         'health' : 1000
     }
     }
-    time.sleep(1)
     for option in chasis:
         player_select = chasis[option]
         cost = player_select['cost']
@@ -216,7 +217,6 @@ def select_core():
         'energy' : 1000
     }
     }
-    time.sleep(1)
     for option in core:
         player_select = core[option]
         cost = player_select['cost']
@@ -263,7 +263,6 @@ def select_engine():
         'power' : 250
     }
     }
-    time.sleep(1)
     for option in engine:
         player_select = engine[option]
         cost = player_select['cost']
@@ -290,6 +289,8 @@ def select_specialty():
     '4' : 'Champion', # Allows champion parts to be equiped
     '5' : 'Swarmer' # Cheaper
     }
+    for option in specialties:
+        print(f'{option} : {specialties[option]}')
     question = input('Awaiting input: ')
     if question in specialties:
         specialty = specialties[question]
@@ -298,8 +299,17 @@ def select_specialty():
         print('Enter a number.')
 
 def install_part():
-    print(f"Pick a robot: {list_bots()}, or type 'quit' to quit (Capitalisation matters)")
+    global player_bots
+    print("Pick a robot, or type 'quit' to quit (Capitalisation matters)")
+    counter = 0
+    bot_list = []
+    for bot in player_bots:
+        bot_list.append(bot)
+        print(f"{counter} : {bot}")
+        counter += 1
     question = input('Awaiting input: ')
+    if question.isdigit():
+        question = bot_list[int(question)]
     if question in ['quit', 'Quit', 'QUIT']:
         return
     elif question in player_bots:
@@ -325,47 +335,80 @@ def install_part():
         installing = True
         while installing:
             if total_parts < allowed_parts:
-                print('Current owned parts: ')
-                if champion_parts and champ: # List parts
-                    print('\nChampion Part List:')
-                    for part in champion_parts:
-                        print(part)
-                if weapon_parts:
-                    print('\nWeapon Part List:')
-                    for part in weapon_parts:
-                        print(part)
-                if utility_parts:
-                    print('\nUtility Part List:')
-                    for part in utility_parts:
-                        print(part)
-                # Stop listing
-                print() 
-                print(f'Do you wish to install a part into {selected_bot}, \n current parts:')
+                print("current installed parts:")
+                if not selected_bot['parts']:
+                    print('No parts installed')
                 for part in selected_bot['parts']:
                     print(part)
-                question = input('Awaiting input: ')
-                if question.lower in ['y', 'yes']:
-                    while installing:
-                        print('Type in the part you want to install, or "quit" to quit.')
-                        question = input('Awaiting input: ')
-                        if question.lower == 'quit':
-                            installing = False
-                        elif question in selected_bot['parts']:
-                            print('Part is already in the bot.')
-                        elif question in [champion_parts, utility_parts, weapon_parts]:
-                            print('Part found! installing...')
-                            if champ:
-                                for selected_part in champion_parts:
-                                    if selected_part == question:
-                                        champion_parts.remove(selected_part)
-                                        selected_bot['parts'][selected_part]
-                        else:
-                            print('part not found.')
+                while installing:
+                    print('Type in the part number you want to install, or "quit" to quit.')
+                    print('Current owned parts:')
+                    counter = 0
+                    part_list = []
+                    if weapon_parts:
+                        print('\nWeapon Part List: ')
+                        for part in weapon_parts:
+                            print(f'{counter} : {part}')
+                            part_list.append(part)
+                            counter += 1
+                    if utility_parts:
+                        print('\nUtility Part List: ')
+                        for part in utility_parts:
+                            print(f'{counter} : {part}')
+                            part_list.append(part)
+                            counter += 1
+                    if champion_parts and champ: # List parts
+                        print('\nChampion Part List: ')
+                        for part in champion_parts:
+                            print(f'{counter} : {part}')
+                            part_list.append(part)
+                            counter += 1
+                    # Stop listing
+                    print() 
+                    question = input('Awaiting input: ')
+                    if question.isdigit:
+                        question = int(question)
+                        question = part_list[question]
+
+                    if question.lower == 'quit':
+                        installing = False
+                    elif question in selected_bot['parts']:
+                        print('Part is already in the bot.')
+                    elif question in [part_list]:
+                        print('Part found! installing...')
+                        if champ:
+                            for part in champion_parts:
+                                if part == question:
+                                    champion_parts.remove(part)
+                                    apply_part(part, selected_bot)
+                                    installing = False
+                        for part in utility_parts:
+                            if part == question:
+                                utility_parts.remove(part)
+                                apply_part(part, selected_bot)
+                                return
+                        for part in weapon_parts:
+                            if part == question:
+                                weapon_parts.remove(part)
+                                apply_part(part, selected_bot)
+                                return
+                    else:
+                        print('part not found.')
                 else:
                     installing = False
         else:
             print('Exiting')
     # End Of installing parts
+def apply_part(new_part, this_bot):
+    if new_part == 'Blade':
+        this_bot['parts']['Blade'] = {
+            'name' : 'Blade',
+            'type' : 'attack',
+            'damage' : 100
+        }
+        print('Success!')
+    
+    # end of Apply Part
 def next_event():
     global game_time
     events = ['Build bot', 'Scavange for resources']
@@ -429,7 +472,7 @@ scrap = 0
 # Bots
 player_bots = {}
 utility_parts = []
-weapon_parts = []
+weapon_parts = ['Blade', 'Blade']
 champion_parts = []
 # Game start
 player_name = input('What is your name: ')
