@@ -117,7 +117,8 @@ def build_bot():
     elif specialty == 'Striker':
         bot_loadout['power'] = bot_loadout['power'] * 1.5
     elif specialty == 'Defender':
-        bot_loadout['health'] = bot_loadout['health'] * 2
+        bot_loadout['max_hp'] = bot_loadout['max_hp'] * 2
+        bot_loadout['hp'] = bot_loadout['hp'] * 2
         bot_loadout['armor'] = bot_loadout['armor'] + 10
 
     if scrap >= cost:
@@ -125,6 +126,10 @@ def build_bot():
         question = input('Awaiting input: ')
         if question in ['y', 'Y', 'Yes', 'yes']:
             player_bots[name] = bot_loadout
+            scrap -= cost
+    else: 
+        print('You do not have enough scrap to build this.')
+        time.sleep(1)
     print('Exiting build mode.')
     # End of build bot
 # Selecting bot parts
@@ -299,7 +304,7 @@ def select_specialty():
 def install_part():
     global player_bots
     print("Pick a robot, or type 'quit' to quit (Capitalisation matters)")
-    counter = 0
+    counter = 1
     bot_list = []
     for bot in player_bots:
         bot_list.append(bot)
@@ -307,7 +312,7 @@ def install_part():
         counter += 1
     question = input('Awaiting input: ')
     if question.isdigit():
-        question = bot_list[int(question)]
+        question = bot_list[int(question) - 1]
     if question in ['quit', 'Quit', 'QUIT']:
         return
     elif question in player_bots:
@@ -341,7 +346,7 @@ def install_part():
                 while installing:
                     print('Type in the part number you want to install, or "quit" to quit.')
                     print('Current owned parts:')
-                    counter = 0
+                    counter = 1
                     part_list = []
                     if weapon_parts:
                         print('\nWeapon Part List: ')
@@ -365,7 +370,7 @@ def install_part():
                     print() 
                     question = input('Awaiting input: ')
                     if question.isdigit:
-                        question = int(question)
+                        question = int(question) - 1
                         question = part_list[question]
                         if question in selected_bot['parts']:
                             print('Part is already in the bot.')
@@ -595,6 +600,161 @@ def list_bots():
         names.append(bot)
     return names
 
+
+# - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
+def summon_evil_bots():
+    agro_bots['Test Dummy'] = {
+        'name' : 'Test Dummy',
+        'max_hp' : 100,
+        'hp' : 100,
+        'armor' : 25,
+        'power' : 100,
+        'energy' : 100,
+        'specialty' : 'Striker',
+        'parts' : {
+            'Spinning Blade': {
+                'name' : 'Spinning Blade',
+                'description' : 'T2 Attack',
+                'type' : 'attack',
+                'damage' : 100
+            }
+        }
+    }
+def combat_cycle():
+    # Ensure player has bots
+    global main_loop
+    if player_bots:
+        fighting = True
+        summon_evil_bots()
+    else:
+        fighting = False
+        main_loop = False
+
+    # Battle Condition Check
+    while fighting:
+        player_turn()
+        print()
+        print()
+        if not agro_bots:
+            print('You won the fight!')
+            scavenge()
+            fighting = False
+        elif not player_bots:
+            fighting = False
+            main_loop = False
+    # End of combat cycle
+        
+def player_turn():
+    for character in player_bots:
+        for foe in agro_bots:
+            foelist = []
+            list_item = f"{foe} : {agro_bots[foe]['hp']}"
+            foelist.append(list_item)
+        else:
+            print()
+            print('Aggressive bots:')
+            print(foelist)
+            print()
+        print(f"It is {character}'s turn.")
+        if 'guard' in player_bots[character]:
+            del player_bots[character]['guard']
+            print(f'{character} lowers their guard.')
+        if player_bots[character]['parts']:
+            counter = 0
+            parts = []
+            for option in player_bots[character]['parts']:
+                counter += 1
+                parts.append(option)
+                print(f"{counter} : {option}")
+            else:
+                print('What do you do?')
+                question_error_handle = True
+                while question_error_handle:
+                    question = input('Awaiting input: ')
+                    if question.isdigit():
+                        question = int(question) - 1
+                        if -1 < question < counter:
+                            question = parts[question]
+                            question_error_handle = False
+                        else:
+                            print('Please enter a valid number.')
+                    else:
+                        print('Please enter a number.')
+                # End of error handle
+                player_use_part(character, question)
+                print()
+    else:
+        print(f'{character}, has no parts to fight with!')
+def player_use_part(user, part):
+    print()
+    targeting = True
+    part_stats = player_bots[user]['parts'][part]
+    if part_stats['type'] == 'attack':
+        damage = part_stats['damage']
+        damage = damage * player_bots[user]['power'] / 100 
+        print('Pick a target for the attack.')
+        counter = 0
+        bot_list = []
+        for bot in agro_bots:
+            counter += 1
+            bot_list.append(bot)
+            print(f"{counter} : {bot}")
+        while targeting:
+            question = input('Awaiting input: ')
+            if question.isdigit():
+                question = int(question) - 1
+                if -1 < question < counter:
+                    target = bot_list[question]
+                    targeting = False
+                else:
+                    print('Please enter a valid number.')
+            else:
+                print('Please enter a number.')
+            # End of targeting
+        damage -= agro_bots[target]['armor']
+        if 'guard' in agro_bots[target]:
+            damage -= agro_bots[target]['guard']
+        
+        agro_bots[target]['hp'] -= damage
+        print(f'{user} attacks {target} for {damage:.1f} damage.')
+        check_life(agro_bots, target)
+
+    elif part_stats['type'] == 'heal':
+        heal = part_stats['healing']
+        heal = heal * player_bots[user]['power'] / 100 
+
+        print('Pick a target for the healing.')
+        counter = 1
+        bot_list = []
+        for bot in player_bots:
+            bot_list.append(bot)
+            print(f"{counter} : {bot}")
+            counter += 1
+        while targeting:
+            question = input('Awaiting input: ')
+            if question.isdigit():
+                target = bot_list[int(question) - 1]
+            # End of targeting
+        player_bots[target]['hp'] += {heal}
+        if player_bots[target]['hp'] > player_bots[target]['max_hp']:
+            player_bots[target]['hp'] = player_bots[target]['max_hp']
+        print(f'{user} heals {target} for {heal:.1f} health.')
+        # End of healing
+
+    elif part_stats['type'] == 'block':
+        guard = part_stats['guard']
+        player_bots[user]['guard'] = guard
+        print(f'{user} braces for {guard:.1f} additional damage.')
+
+    elif part_stats['type'] == 'special':
+        print('This special part has no coded use yet! (sorry)')
+    print()
+
+def check_life(team, character):
+    if team[character]['hp'] < 1:
+        print(f'{character} has been destroyed!')
+        del team[character]
+
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -604,20 +764,36 @@ game_time = {
 main_loop = True
 scrap = 0
 # Bots
-player_bots = {}
-utility_parts = ['']
-weapon_parts = ['Blade']
+player_bots = {
+    'Test Dummy' : {
+        'name' : 'Test Dummy',
+        'max_hp' : 100,
+        'hp' : 100,
+        'armor' : 25,
+        'power' : 100,
+        'energy' : 100,
+        'specialty' : 'Striker',
+        'parts' : {
+            'Spinning Blade': {
+                'name' : 'Spinning Blade',
+                'description' : 'T2 Attack',
+                'type' : 'attack',
+                'damage' : 100
+            }
+        }
+    }
+    }
+agro_bots = {}
+utility_parts = []
+weapon_parts = ['Red Laser']
 champion_parts = []
 # Game start
 player_name = input('What is your name: ')
-# print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of robots.')
-# time.sleep(1)
-# print('You have made it 50 miles deep into enemy territory and will make your stand here, you go to bed, your elite team by your side, you are ready!')
-# time.sleep(1)
-# print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents, they won\'t repower in time.')
-# time.sleep(1)
-# print('You scrap the attacking robots')
-# time.sleep(0.5)
+print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of robots.')
+print('You have made it 50 miles deep into enemy territory and will make your stand here, you go to bed, your elite team by your side, you are ready!')
+print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents, they won\'t repower in time.')
+time.sleep(1)
+print('You scrap the attacking robots')
 gain_scrap(250)
 # time.sleep(0.5)
 print('\nYour old force needs to be put to use...')
@@ -626,3 +802,4 @@ scavenge()
 while main_loop:
     next_event()
     print(f'Your bots: {list_bots()}')
+    combat_cycle()
