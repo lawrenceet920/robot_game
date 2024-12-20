@@ -47,8 +47,16 @@ def gain_scrap(amount):
 
 def get_time():
     global game_time
+    # Add time
+    game_time["hour"] += 1
+    game_time["sleep"] -= 1
+    if game_time["hour"] == 25:
+        game_time['day'] += 1
+        game_time["hour"] = 1
+    time.sleep(0.5)
+    # Tell Time
     print('\n******************************')
-    print(f'It is hour {game_time["hour"]} on day {game_time["day"]}')
+    print(f'It is {game_time["hour"]}:00 on day {game_time["day"]}')
     if 8 < game_time['sleep']:
         print('You are well rested')
     elif 4 < game_time['sleep']:
@@ -58,23 +66,9 @@ def get_time():
     else:
         print('You are sleep deprived')
     print('******************************\n')
+    time.sleep(0.5)
     # End of get time
         
-def random_utility():
-    '''Generates a random utility part from list'''
-    rand = random.randint(1,10)
-    return rand
-    # End of random utility
-def random_weapon():
-    '''Generates a random weapon part from list'''
-    rand = random.randint(1,10)
-    return rand
-    # End of random utility
-def random_champion():
-    '''Generates a random champion part from list'''
-    rand = random.randint(1,10)
-    return rand
-    # End of random champion
 
 # - - - - - - - - - - - - - - - - - - - - -#- BUILD BOT -#- - - - - - - - - - - - - - - - - - - - - #
 
@@ -99,7 +93,12 @@ def build_bot():
     specialty = select_specialty()
     print()
 
-    name = input('Name your bot:    ')
+    while True:
+        name = input('Name your bot:    ')
+        if name not in player_bots:
+            break
+        else:
+            print('Please use a unique name.')
     bot_loadout = {
         'name' : name,
         'max_hp' : chasis['health'],
@@ -127,7 +126,6 @@ def build_bot():
         if question in ['y', 'Y', 'Yes', 'yes']:
             player_bots[name] = bot_loadout
     print('Exiting build mode.')
-    get_time()
     # End of build bot
 # Selecting bot parts
 def select_chasis():
@@ -369,12 +367,9 @@ def install_part():
                     if question.isdigit:
                         question = int(question)
                         question = part_list[question]
-
-                    if question.lower == 'quit':
-                        installing = False
-                    elif question in selected_bot['parts']:
-                        print('Part is already in the bot.')
-                    elif question in [part_list]:
+                        if question in selected_bot['parts']:
+                            print('Part is already in the bot.')
+                            return
                         print('Part found! installing...')
                         if champ:
                             for part in champion_parts:
@@ -392,6 +387,8 @@ def install_part():
                                 weapon_parts.remove(part)
                                 apply_part(part, selected_bot)
                                 return
+                    elif question.lower == 'quit':
+                        installing = False
                     else:
                         print('part not found.')
                 else:
@@ -399,20 +396,144 @@ def install_part():
         else:
             print('Exiting')
     # End Of installing parts
+
+# - - - - - - - - - - - - - - - - - - - - -#-BOT PARTS! -#- - - - - - - - - - - - - - - - - - - - - #
 def apply_part(new_part, this_bot):
-    if new_part == 'Blade':
-        this_bot['parts']['Blade'] = {
-            'name' : 'Blade',
+    if new_part == 'Fencing Sword':
+        this_bot['parts']['Fencing Sword'] = {
+            'name' : 'Fencing Sword',
+            'description' : 'T1 Attack',
+            'type' : 'attack',
+            'damage' : 75
+        }
+        print('Success!')
+    elif new_part == 'Spinning Blade':
+        this_bot['parts']['Spinning Blade'] = {
+            'name' : 'Spinning Blade',
+            'description' : 'T2 Attack',
             'type' : 'attack',
             'damage' : 100
         }
         print('Success!')
+    elif new_part == 'Red Laser':
+        this_bot['parts']['Red Laser'] = {
+            'name' : 'Red Laser',
+            'description' : 'T3 Attack',
+            'type' : 'attack',
+            'damage' : 150
+        }
+        print('Success!')
     
+
+    elif new_part == 'Repair Nanites':
+        this_bot['parts']['Repair Nanites'] = {
+            'name' : 'Repair Nanites',
+            'description' : 'T1 Heal',
+            'type' : 'heal',
+            'healing' : 100
+        }
+        print('Success!')
+    elif new_part == 'System Analysis':
+        this_bot['parts']['System Analysis'] = {
+        'name' : 'System Analysis',
+        'description' : 'T2 Heal',
+        'type' : 'heal',
+        'healing' : 150
+    }
+        print('Success!')
+    elif new_part == 'Reboot':
+        this_bot['parts']['Reboot'] = {
+        'name' : 'Reboot',
+        'description' : 'T3 Heal',
+        'type' : 'heal',
+        'healing' : 200
+    }
+        print('Success!')
+
+
+    elif new_part == 'Raise Shield':
+        this_bot['parts']['Raise Shield'] = {
+            'name' : 'Raise Shield',
+            'description' : 'T1 Block',
+            'type' : 'block',
+            'guard' : 25
+        }
+        print('Success!')
+    elif new_part == 'Energy Shields':
+        this_bot['parts']['Energy Shields'] = {
+            'name' : 'Energy Shields',
+            'description' : 'T2 Block',
+            'type' : 'block',
+            'guard' : 50
+        }
+        print('Success!')
+
+
+    elif new_part == 'Guard':
+        this_bot['parts']['Guard'] = {
+            'name' : 'Guard',
+            'description' : 'Taunt Foes',
+            'type' : 'Special',
+        }
+        print('Success!')
+    elif new_part == 'Repair Nanite Swarm':
+        this_bot['parts']['Repair Nanite Swarm'] = {
+            'name' : 'Repair Nanite Swarm',
+            'description' : 'Group Heal',
+            'type' : 'Special',
+        }
+        print('Success!')
     # end of Apply Part
+def random_utility():
+    '''Generates a random utility part from list'''
+    utilities = [
+        'Repair Nanites', 'Raise Shield', 'Reboot', 'Energy Shields', 'System Analysis', 'Guard', 'Repair Nanite Swarm'
+    ]
+    rand = random.randint(1, 23)
+    if rand < 5:
+        rand = utilities[0]
+    elif rand < 10:
+        rand = utilities[1]
+    elif rand < 14:
+        rand = utilities[2]
+    elif rand < 18:
+        rand = utilities[3]
+    elif rand < 21:
+        rand = utilities[4]
+    elif rand < 23:
+        rand = utilities[5]
+    else:
+        rand = utilities[6]
+    print(f'You got a: {rand}')
+    return rand
+    # End of random utility
+def random_weapon():
+    '''Generates a random weapon part from list'''
+    weapons = [
+        'Fencing Sword', 'Spinning Blade', 'Red Laser'
+    ]
+    rand = random.randint(1, 10)
+    if rand < 5:
+        rand = weapons[0]
+    elif rand < 9:
+        rand = weapons[1]
+    else:
+        rand = weapons[2]
+    print(f'You got a: {rand}')
+    return rand
+    # End of random Weapon
+def random_champion():
+    '''Generates a random champion part from list'''
+    rand = random.randint(1, 10)
+    print(f'You got a: {rand}')
+    return rand
+    # End of random champion
+
+# End of part listings
 def next_event():
     global game_time
-    events = ['Build bot', 'Scavange for resources']
-    if game_time['hour'] >= 19:
+    events = ['Build bot', 'Scavange for resources', 'Wait']
+    if 20 < game_time['hour'] or game_time['hour'] < 4:
         events.append('Sleep')
     if len(player_bots) >= 1:
         events.append('Install bot parts')
@@ -436,21 +557,34 @@ def next_event():
     if question == 'Build bot':
         build_bot()
     elif question == 'Scavange for resources':
-        print('You scavenge for resources and look for? \n 1: 500 scrap \n 2: random utility part \n 3: random champion part')
         scavenge()
     elif question == 'Install bot parts':
         install_part()
+    elif question == 'Wait':
+        print('Time passes by')
+    elif question == 'Sleep':
+        print('You lay your head down, time flies by...')
+        while game_time['hour'] != 9:
+            get_time()
+            game_time['sleep'] += 3
+        else:
+            game_time['hour'] -=1
+            game_time['sleep'] += 1
 def scavenge():
     while True:
+        print('You scavenge for resources and get: \n 1: scrap \n 2: random Champion part \n 3: random Utility part \n 4: random Weapon part \n')
         question = input('Awaiting input: ')
         if question == '1':
             gain_scrap(500)
             break
         elif question == '2':
-            random_champion()
+            champion_parts.append(random_champion())
             break
         elif question == '3':
-            random_utility()
+            utility_parts.append(random_utility())
+            break
+        elif question == '4':
+            weapon_parts.append(random_weapon())
             break
         else:
             print('Invalid input, material 1, 2 or 3.')
@@ -471,8 +605,8 @@ main_loop = True
 scrap = 0
 # Bots
 player_bots = {}
-utility_parts = []
-weapon_parts = ['Blade', 'Blade']
+utility_parts = ['']
+weapon_parts = ['Blade']
 champion_parts = []
 # Game start
 player_name = input('What is your name: ')
@@ -484,14 +618,11 @@ player_name = input('What is your name: ')
 # time.sleep(1)
 # print('You scrap the attacking robots')
 # time.sleep(0.5)
-gain_scrap(1000)
+gain_scrap(250)
 # time.sleep(0.5)
-print('\nWhat do you use your destroyed force for? \n 1: 500 scrap \n 2: random utility part \n 3: random champion part')
+print('\nYour old force needs to be put to use...')
 scavenge()
 
 while main_loop:
     next_event()
     print(f'Your bots: {list_bots()}')
-    question = input('Oops! you made it to the end of the current build! quit?\n')
-    if question == 'quit':
-        break
