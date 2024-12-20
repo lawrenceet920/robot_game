@@ -645,6 +645,7 @@ def combat_cycle():
     # End of combat cycle
         
 def player_turn():
+    print('It is your turn.')
     for character in player_bots:
         for foe in agro_bots:
             foelist = []
@@ -681,21 +682,39 @@ def player_turn():
                     else:
                         print('Please enter a number.')
                 # End of error handle
-                player_use_part(character, question)
+                part_use(player_bots, agro_bots, character, question)
                 print()
     else:
         print(f'{character}, has no parts to fight with!')
-def player_use_part(user, part):
+# End of players turn functions
+
+def agro_bots_turn():
+    for character in agro_bots:
+        print(f"It is {character}'s turn.")
+        if 'guard' in agro_bots[character]:
+            del agro_bots[character]['guard']
+            print(f'{character} lowers their guard.')
+        parts = []
+        for option in agro_bots[character]['parts']:
+            parts.append(option)
+
+        agro_action = random.randint(0, len(parts))
+        agro_action = parts[agro_action]
+        part_use(agro_bots, player_bots, character, agro_action)
+    # End of agrobot turn
+        
+        # ------------ PART USE ------------
+def part_use(myteam, yourteam, user, part):
     print()
     targeting = True
-    part_stats = player_bots[user]['parts'][part]
+    part_stats = myteam[user]['parts'][part]
     if part_stats['type'] == 'attack':
         damage = part_stats['damage']
-        damage = damage * player_bots[user]['power'] / 100 
+        damage = damage * myteam[user]['power'] / 100 
         print('Pick a target for the attack.')
         counter = 0
         bot_list = []
-        for bot in agro_bots:
+        for bot in yourteam:
             counter += 1
             bot_list.append(bot)
             print(f"{counter} : {bot}")
@@ -711,22 +730,22 @@ def player_use_part(user, part):
             else:
                 print('Please enter a number.')
             # End of targeting
-        damage -= agro_bots[target]['armor']
-        if 'guard' in agro_bots[target]:
-            damage -= agro_bots[target]['guard']
+        damage -= yourteam[target]['armor']
+        if 'guard' in yourteam[target]:
+            damage -= yourteam[target]['guard']
         
-        agro_bots[target]['hp'] -= damage
+        yourteam[target]['hp'] -= damage
         print(f'{user} attacks {target} for {damage:.1f} damage.')
-        check_life(agro_bots, target)
+        check_life(yourteam, target)
 
     elif part_stats['type'] == 'heal':
         heal = part_stats['healing']
-        heal = heal * player_bots[user]['power'] / 100 
+        heal = heal * myteam[user]['power'] / 100 
 
         print('Pick a target for the healing.')
         counter = 1
         bot_list = []
-        for bot in player_bots:
+        for bot in myteam:
             bot_list.append(bot)
             print(f"{counter} : {bot}")
             counter += 1
@@ -735,20 +754,21 @@ def player_use_part(user, part):
             if question.isdigit():
                 target = bot_list[int(question) - 1]
             # End of targeting
-        player_bots[target]['hp'] += {heal}
-        if player_bots[target]['hp'] > player_bots[target]['max_hp']:
-            player_bots[target]['hp'] = player_bots[target]['max_hp']
+        myteam[target]['hp'] += {heal}
+        if myteam[target]['hp'] > myteam[target]['max_hp']:
+            myteam[target]['hp'] = myteam[target]['max_hp']
         print(f'{user} heals {target} for {heal:.1f} health.')
         # End of healing
 
     elif part_stats['type'] == 'block':
         guard = part_stats['guard']
-        player_bots[user]['guard'] = guard
+        myteam[user]['guard'] = guard
         print(f'{user} braces for {guard:.1f} additional damage.')
 
     elif part_stats['type'] == 'special':
         print('This special part has no coded use yet! (sorry)')
     print()
+# End of part Use
 
 def check_life(team, character):
     if team[character]['hp'] < 1:
