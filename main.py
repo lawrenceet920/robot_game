@@ -535,20 +535,37 @@ def random_champion():
     # End of random champion
 
 # End of part listings
+# ----- EVENT TRACKER ----- #
 def next_event():
     global game_time
-    events = ['Build bot', 'Scavange for resources', 'Wait']
-    if 20 < game_time['hour'] or game_time['hour'] < 4:
+    # Defualt event list (Always available)
+    events = ['wait', 'Build bot']
+    # Conditional events
+    if 20 < game_time['hour'] or game_time['hour'] < 4: 
         events.append('Sleep')
     if len(player_bots) >= 1:
         events.append('Install bot parts')
+    if random.randint(1,4) == 1:
+        events.append('Scavange for resources')
+    else:
+        print('You decide that you need more supplies.')
+        start_fight_quotes = [
+            'You spot a group of corrupt, you move in.',
+            'A group of scouts are on the way, you ambush them!',
+            'A momentary standoff starts as you run into a group of corrupt, you don\'t let them go first.',
+            'You hear a loud sound approch, you hide, after it passes you set your eyes on a squadren that fell behind.'
+            'A new group of corrupt stop juuust outside of camp, you move in.,'
+        ]
+        print(start_fight_quotes[random.randint(0, 4)])
+        events.append('Fight')
+
     get_time()
     print('\nWhat do you do now?')
     counter = 0
-    for event in events:
+    for event in events: # Log all event options and number them
         counter += 1
-        print(f'{counter} : {event}')
-    while True:
+        print(f'{counter} : {event}') 
+    while True: # Find event
         question = input('Awaiting input: ')
         if question.isdigit():
             if int(question) <= len(events):
@@ -562,13 +579,32 @@ def next_event():
     if question == 'Build bot':
         build_bot()
     elif question == 'Scavange for resources':
+        scavenge_quotes = [
+            'You spot a pile of rubble, score!',
+            'Somehow you missed a group of corrupt arrive, lucky you, they are powered down!'
+        ]
         scavenge()
     elif question == 'Install bot parts':
         install_part()
     elif question == 'Wait':
         print('Time passes by')
+    elif question == 'Fight':
+        combat_cycle()
     elif question == 'Sleep':
-        print('You lay your head down, time flies by...')
+        print('You lay your head down.')
+        resting_quotes = [
+            'A cold breeze takes out your fire, you shiver to keep warm.',
+            'An animal passes your tent, you don\'t know if you should feel worried or better protected.',
+            'It begins to rain, you are grateful your tent can\'t be corrupted.',
+            'heavy fog rolls in, you are cold, but safe.',
+            'You think about the city, you have to do this.',
+            'The crackling of your fire gives you nightmares, it was never your fault.',
+            'You miss your city, at least if you fail you can\'t fail them again, right?',
+            'You hope your measly piles of scrap will somehow beat the swarm.',
+            'Nothing disturbs you'
+        ]
+        print(resting_quotes[random.randint(0, 8)])
+        print('Time flies by...')
         while game_time['hour'] != 9:
             get_time()
             game_time['sleep'] += 3
@@ -592,7 +628,7 @@ def scavenge():
             weapon_parts.append(random_weapon())
             break
         else:
-            print('Invalid input, material 1, 2 or 3.')
+            print('Invalid input, material 1, 2, 3 or 4.')
 def list_bots():
     global player_bots
     names = []
@@ -603,7 +639,7 @@ def list_bots():
 
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
 def summon_evil_bots():
-    agro_bots['Test Dummy'] = {
+    agro_bots['Blade Bot'] = {
         'name' : 'Test Dummy',
         'max_hp' : 100,
         'hp' : 100,
@@ -621,6 +657,8 @@ def summon_evil_bots():
         }
     }
 def combat_cycle():
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print('Combat has started')
     # Ensure player has bots
     global main_loop
     if player_bots:
@@ -637,9 +675,11 @@ def combat_cycle():
         print()
         if not agro_bots:
             print('You won the fight!')
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             scavenge()
             fighting = False
         elif not player_bots:
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
             fighting = False
             main_loop = False
     # End of combat cycle
@@ -809,11 +849,12 @@ weapon_parts = ['Red Laser']
 champion_parts = []
 # Game start
 player_name = input('What is your name: ')
-print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of robots.')
-print('You have made it 50 miles deep into enemy territory and will make your stand here, you go to bed, your elite team by your side, you are ready!')
-print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents, they won\'t repower in time.')
+print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
+print('You have made it 50 miles deep into corrupted territory, You have to make your stand here, you go to sleep, your elite team by your side, you are ready!')
+print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents.')
+print('You take a look at them, even if they repower it won\'t be in time.')
 time.sleep(1)
-print('You scrap the attacking robots')
+print('You scrap the corrupted robots, you\'ll need all the materials you can get.')
 gain_scrap(250)
 # time.sleep(0.5)
 print('\nYour old force needs to be put to use...')
@@ -822,4 +863,3 @@ scavenge()
 while main_loop:
     next_event()
     print(f'Your bots: {list_bots()}')
-    combat_cycle()
