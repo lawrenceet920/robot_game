@@ -553,8 +553,8 @@ def next_event():
             'You spot a group of corrupt, you move in.',
             'A group of scouts are on the way, you ambush them!',
             'A momentary standoff starts as you run into a group of corrupt, you don\'t let them go first.',
-            'You hear a loud sound approch, you hide, after it passes you set your eyes on a squadren that fell behind.'
-            'A new group of corrupt stop juuust outside of camp, you move in.,'
+            'You hear a loud sound approch, you hide, after it passes you set your eyes on a squadren that fell behind.',
+            'A new group of corrupt stop juuust outside of camp, you move in.'
         ]
         print(start_fight_quotes[random.randint(0, 4)])
         events.append('Fight')
@@ -581,8 +581,13 @@ def next_event():
     elif question == 'Scavange for resources':
         scavenge_quotes = [
             'You spot a pile of rubble, score!',
-            'Somehow you missed a group of corrupt arrive, lucky you, they are powered down!'
+            'Somehow you missed a group of corrupt arrive, lucky you however, they are powered down!',
+            'You check on your water filter by the river and harvest out all the usable material',
+            'You empty out your trash and sort and seperate all the recycleables.',
+            'You follow the river upstream and find a pile of material collected at it\'s side.',
+            'You return to a fight from a few days ago, some stuff has been untouched'
         ]
+        print(scavenge_quotes[random.randint(0, 6)])
         scavenge()
     elif question == 'Install bot parts':
         install_part()
@@ -639,23 +644,36 @@ def list_bots():
 
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
 def summon_evil_bots():
-    agro_bots['Blade Bot'] = {
-        'name' : 'Test Dummy',
-        'max_hp' : 100,
-        'hp' : 100,
-        'armor' : 25,
-        'power' : 100,
-        'energy' : 100,
-        'specialty' : 'Striker',
-        'parts' : {
-            'Spinning Blade': {
-                'name' : 'Spinning Blade',
-                'description' : 'T2 Attack',
-                'type' : 'attack',
-                'damage' : 100
-            }
-        }
-    }
+    global game_time
+    challenge_rating = game_time['day'] * 50 # Day > Hour
+    challenge_rating += game_time['hour']
+    challenge_rating += 49 # game starts at CR 100 (Unmodified)
+    agro_count = random.randint(1, 4)
+    if agro_count == 4:
+        agro_count = 5
+        challenge_rating /= 5
+    
+
+
+
+
+    # agro_bots['Blade Bot'] = {
+    #     'name' : 'Test Dummy',
+    #     'max_hp' : 100,
+    #     'hp' : 100,
+    #     'armor' : 25,
+    #     'power' : 100,
+    #     'energy' : 100,
+    #     'specialty' : 'Striker',
+    #     'parts' : {
+    #         'Spinning Blade': {
+    #             'name' : 'Spinning Blade',
+    #             'description' : 'T2 Attack',
+    #             'type' : 'attack',
+    #             'damage' : 100
+    #         }
+    #     }
+    # }
 def combat_cycle():
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print('Combat has started')
