@@ -250,17 +250,17 @@ engine_dict = {
     '2' : {
         'material' : 'Car',
         'cost' : 50,
-        'power' : 100
+        'power' : 70
     },
     '3' : {
         'material' : 'Racecar',
         'cost' : 100,
-        'power' : 150
+        'power' : 100
     },
     '4' : {
         'material' : 'Truck',
         'cost' : 200,
-        'power' : 200
+        'power' : 150
     },
     '5' : {
         'material' : 'Jet',
@@ -386,17 +386,17 @@ def install_part():
                             for part in champion_parts:
                                 if part == question:
                                     champion_parts.remove(part)
-                                    apply_part(part, selected_bot)
+                                    apply_part(part, selected_bot, True)
                                     installing = False
                         for part in utility_parts:
                             if part == question:
                                 utility_parts.remove(part)
-                                apply_part(part, selected_bot)
+                                apply_part(part, selected_bot, True)
                                 return
                         for part in weapon_parts:
                             if part == question:
                                 weapon_parts.remove(part)
-                                apply_part(part, selected_bot)
+                                apply_part(part, selected_bot, True)
                                 return
                     elif question.lower == 'quit':
                         installing = False
@@ -409,8 +409,7 @@ def install_part():
     # End Of installing parts
 
 # - - - - - - - - - - - - - - - - - - - - -#-BOT PARTS! -#- - - - - - - - - - - - - - - - - - - - - #
-def apply_part(new_part, this_bot):
-    print(new_part)
+def apply_part(new_part, this_bot, isplayer):
 
     if new_part == 'Fencing Sword':
         this_bot['parts']['Fencing Sword'] = {
@@ -503,7 +502,8 @@ def apply_part(new_part, this_bot):
     else:
         print(f'Error in function: apply_part, {new_part}part not in elif list ~406 - ~483')
     # print only when player using
-    print('Success')
+    if isplayer:
+        print('Success')
     # end of Apply Part
 def random_utility(team):
     '''Generates a random utility part from list'''
@@ -793,9 +793,9 @@ def summon_this_agro_bot(bot_cr):
     # - - parts
     if agro_bots[name]['specialty'] == 'Champion': # If bot is champ give it another part
         bot_cr += 100
-    apply_part(get_agro_parts(name), agro_bots[name]) # This part is here to ensure the bot can act
+    apply_part(get_agro_parts(name), agro_bots[name], False) # This part is here to ensure the bot can act
     while bot_cr > 99 and len(agro_bots[name]['parts']) < 5:
-        apply_part(get_agro_parts(name), agro_bots[name])
+        apply_part(get_agro_parts(name), agro_bots[name], False)
         bot_cr -= 100
 
 
@@ -819,6 +819,7 @@ def get_agro_parts(name):
     return bot_part
 
 def combat_cycle():
+    global turn
     global taunt_list
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     taunt_list = {}
@@ -834,7 +835,9 @@ def combat_cycle():
 
     # Battle Condition Check
     while fighting:
+        turn = True
         player_turn()
+        turn = False
         print()
         agro_bots_turn()
         print()
@@ -919,11 +922,14 @@ def part_use(myteam, yourteam, user, part):
     part_stats = myteam[user]['parts'][part]
     if part_stats['type'] == 'attack':
         damage = part_stats['damage']
-        damage = damage * myteam[user]['power'] / 100 
-        targeting_ability(myteam, yourteam, False)
+        print(f'Base damage {damage}')
+        damage += damage * myteam[user]['power'] / 100 
+        print(f'Power {damage}')
+        target = targeting_ability(myteam, yourteam, False)
         damage -= yourteam[target]['armor']
         if 'guard' in yourteam[target]:
             damage -= yourteam[target]['guard']
+        print(f'After armor {damage}')
         
         yourteam[target]['hp'] -= damage
         print(f'{user} attacks {target} for {damage:.1f} damage.')
@@ -933,7 +939,7 @@ def part_use(myteam, yourteam, user, part):
         heal = part_stats['healing']
         heal = heal * myteam[user]['power'] / 100 
         target = targeting_ability(myteam, yourteam, True)
-        myteam[target]['hp'] += {heal}
+        myteam[target]['hp'] += heal
         if myteam[target]['hp'] > myteam[target]['max_hp']:
             myteam[target]['hp'] = myteam[target]['max_hp']
         print(f'{user} heals {target} for {heal:.1f} health.')
@@ -962,16 +968,55 @@ def check_life(team, character):
 # Part specific functions
 def targeting_ability(myteam, yourteam, is_positive_ability):
     global taunt_list
+    global turn
+    taunted = False 
+
     if is_positive_ability:
-        print('Pick a target for the attack.')
+        if turn:
+            print('Pick a target for the attack.')
         counter = 0
         bot_list = []
         for bot in myteam:
             counter += 1
             bot_list.append(bot)
-            print(f"{counter} : {bot}")
-        while True:
-            question = input('Awaiting input: ')
+            if turn:
+                print(f"{counter} : {bot}")
+    else:
+        # Find if taunted
+        if taunt_list:
+            for character in taunt_list:
+                if character not in myteam:
+                    taunted = True
+
+        if taunted: # TAUNTED
+            if turn:
+                print('Pick a target for the attack.')
+            counter = 0
+            bot_list = []
+            for bot in yourteam:
+                if bot in taunt_list:
+                    counter += 1
+                    bot_list.append(bot)
+                    if turn:
+                        print(f"{counter} : {bot}")
+
+        else: # NOT TAUNTED
+            if turn:
+                print('Pick a target for the attack.')
+            counter = 0
+            bot_list = []
+            for bot in yourteam:
+                counter += 1
+                bot_list.append(bot)
+                if turn:
+                    print(f"{counter} : {bot}")
+
+    # After target options are declared
+    while True:
+            if turn:
+                question = input('Awaiting input: ')
+            else:
+                question = str(random.randint(1, len(bot_list)))
             if question.isdigit():
                 question = int(question) - 1
                 if -1 < question < counter:
@@ -980,32 +1025,6 @@ def targeting_ability(myteam, yourteam, is_positive_ability):
                     print('Please enter a valid number.')
             else:
                 print('Please enter a number.')
-    else:
-        taunted = False
-        if taunt_list:
-            for character in taunt_list:
-                if character not in myteam:
-                    taunted = True
-        if taunted:
-            print('taunted')
-        else:
-            print('Pick a target for the attack.')
-            counter = 0
-            bot_list = []
-            for bot in yourteam:
-                counter += 1
-                bot_list.append(bot)
-                print(f"{counter} : {bot}")
-            while True:
-                question = input('Awaiting input: ')
-                if question.isdigit():
-                    question = int(question) - 1
-                    if -1 < question < counter:
-                        return bot_list[question]
-                    else:
-                        print('Please enter a valid number.')
-                else:
-                    print('Please enter a number.')
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -1040,6 +1059,7 @@ weapon_parts = ['Red Laser']
 champion_parts = []
 # Battle globals
 taunt_list = {}
+turn = True # True is playerturn
 # Game start
 player_name = input('What is your name: ')
 '''
