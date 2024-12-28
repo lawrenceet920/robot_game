@@ -4,44 +4,19 @@
 import time
 import random
 """Plan:
-Build and upgrade your bots
-challange other bots
-equip special predefined and user generated weapons
 Fight final boss
-"""
-
-# Building
-"""pick combat style (DPS, Tank, Support, Champion, Swarm)
-    + damage, + armor & Health, + utility slots, + Champion slots, lower build cost
-upgrade combat style
-apply stat-pool (energy cost)
-    Damage, speed, health, armor, support, energy overflow
-apply equipment / abilitys
-    AOE, DOT, Temp stat buff(self and others), Gather scrap, negate damage, taunt, heal, (?Summon?)
-confirm construction"""
-
-# Timeslots
-"""pick one of a few challangers | with some info of bot power (Number of bots, cost est)
 Select special event (clone a bot, buff a bot, scrap pile, sell a bot, Theft, bot specific mission {drill part can mine})
-build a bot takes up a timeslot
-day night cycle effects encounter rate & materials available
-
-sleep deprication?
-rest encounters"""
-
-# Combat
-"""Set battle stakes - scrap, capture robot, Gain time
-Instruct each bot to do something (pokemon doubles)
-other team does random action
-both actions execute based on bot speed
-bots take damage and could break or need repairs
-if hit it high damage cause bot malfunction (lower stats and systems offline)"""
+rest encounters?
+"""
 
 
 def gain_scrap(amount):
     global scrap
     scrap += amount
-    print(f'+ {amount} scrap | you now have {scrap}')
+    if 0 > game_time['sleep']:
+        print(f'+ scrap | you are to tired to count the new total or even collect all of it')
+    else:
+        print(f'+ {amount} scrap | you now have {scrap}')
     # End of gain scrap
 
 def get_time():
@@ -564,7 +539,7 @@ def random_champion(team):
     # End of random champion
 
 # End of part listings
-# ----- EVENT TRACKER ----- #
+#- - - - - - - - - - - - - - - - - - - - -#-EVENT TRACKER-#- - - - - - - - - - - - - - - - - - - - -#
 def next_event():
     global game_time
     # Defualt event list (Always available)
@@ -572,15 +547,24 @@ def next_event():
     # Conditional events
     if 20 < game_time['hour'] or game_time['hour'] < 4: 
         events.append('Sleep')
+    elif 0 > game_time['sleep']:
+        events.append('Sleep')
     if len(player_bots) >= 1:
         events.append('Install bot parts')
+    for bot in player_bots:
+        if player_bots[bot]['hp'] != player_bots[bot]['max_hp']:
+            events.append('Repair bots')
+            break
     if random.randint(1,4) == 1:
         events.append('Scavange for resources')
     else:
         events.append('Fight')
 
     get_time()
-    print('\nWhat do you do now?')
+    if 0 < game_time['sleep']:
+        print('\nWhat now do you do now? I hopes its is sleeps')
+    else:
+        print('\nWhat do you do now?')
     counter = 0
     for event in events: # Log all event options and number them
         counter += 1
@@ -598,6 +582,8 @@ def next_event():
     print()
     if question == 'Build bot':
         build_bot()
+    elif question == 'Repair bots':
+        repair_bots()
     elif question == 'Scavange for resources':
         scavenge_quotes = [
             'You spot a pile of rubble, score!',
@@ -651,10 +637,16 @@ def next_event():
             game_time['sleep'] += 1
 def scavenge():
     while True:
-        print('You scavenge for resources and get: \n 1: scrap \n 2: random Champion part \n 3: random Utility part \n 4: random Weapon part \n')
+        if 0 > game_time['sleep']:
+            print('You scavenge for resources and get: \n 1: That wonky metal thingi \n 2: the one for just that one guysis \n 3: useful stuffs i would hope \n 4: The thing that does the bad things to the other things that do bad\n')
+        else:
+            print('You scavenge for resources and get: \n 1: scrap \n 2: random Champion part \n 3: random Utility part \n 4: random Weapon part \n')
         question = input('Awaiting input: ')
         if question == '1':
-            gain_scrap(500)
+            if 0 > game_time['sleep']:
+                gain_scrap(250)
+            else:
+                gain_scrap(500)
             break
         elif question == '2':
             champion_parts.append(random_champion('player'))
@@ -674,6 +666,33 @@ def list_bots():
         names.append(bot)
     return names
 
+def repair_bots():
+    global scrap
+    cost = 0
+    for bot in player_bots:
+        cost += player_bots[bot]['max_hp'] - player_bots[bot]['hp']
+    print(f'To repair your bots you will need {cost} scrap.')
+    print('1 : Don\'t repair')
+    can = False
+    if cost <= scrap:
+        print(f'2 : Make repairs')
+        can = True
+    while True:
+        question = input('Awaiting input: ')
+        if question.isdigit():
+            question = int(question)
+            if question == 1:
+                break
+            elif question == 2 and can:
+                scrap -= cost
+                for bot in player_bots:
+                    player_bots[bot]['hp'] = player_bots[bot]['max_hp']
+                print('Your bots have been repaired')
+                break
+            else:
+                print('Please enter a valid number.')
+        else:
+            print('Please enter a number.')
 
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
 '''    complete Bot example
@@ -1054,7 +1073,7 @@ player_bots = {
     'Test Dummy' : {
         'name' : 'Test Dummy',
         'max_hp' : 100,
-        'hp' : 100,
+        'hp' : 50,
         'armor' : 25,
         'power' : 100,
         'energy' : 100,
@@ -1080,13 +1099,14 @@ turn = True # True is playerturn
 player_name = input('What is your name: ')
 
 print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
-print('You have made it 50 miles deep into corrupted territory, You have to make your stand here, you go to sleep, your elite team by your side, you are ready!')
+print('You have made it 50 miles deep into corrupted territory, Scrap sticks out of the scorched earth and flows down the rivers, life is still here, but only faintly.')
+print('You have to make your stand here, you set up camp, go to sleep, your elite team by your side, you are ready!')
 print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents.')
 print('You take a look at them, even if they repower it won\'t be in time.')
 time.sleep(1)
 print('You scrap the corrupted robots, you\'ll need all the materials you can get.')
 gain_scrap(250)
-# time.sleep(0.5)
+time.sleep(0.5)
 print('\nYour old force needs to be put to use...')
 scavenge()
 
@@ -1097,4 +1117,7 @@ while main_loop:
 time.sleep(1)
 print('Oh. oh no...')
 time.sleep(1)
-print('Game over!')
+if 0 > game_time['sleep']:
+    print('Nap tiimeee-.')
+else:
+    print('Game over!')
