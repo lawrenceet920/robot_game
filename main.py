@@ -3,8 +3,7 @@
 # Dec 13 2024
 import time
 import random
-"""
-Plan:
+"""Plan:
 Build and upgrade your bots
 challange other bots
 equip special predefined and user generated weapons
@@ -133,9 +132,8 @@ def build_bot():
     print('Exiting build mode.')
     # End of build bot
 # Selecting bot parts
-def select_chasis():
-    print('Select a "Chasis", this will determine base defencive stats.')
-    chasis = {
+
+chasis_dict = {
     '1' : {
         'material' : 'Wooden',
         'cost' : 50,
@@ -173,27 +171,29 @@ def select_chasis():
         'health' : 1000
     }
     }
-    for option in chasis:
-        player_select = chasis[option]
+def select_chasis():
+    global chasis_dict
+    print('Select a "Chasis", this will determine base defencive stats.')
+    for option in chasis_dict:
+        player_select = chasis_dict[option]
         cost = player_select['cost']
         material = player_select['material']
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in chasis:
+        if question in chasis_dict:
             chasis = {
-                'material' : chasis[question]['material'],
-                'cost' : chasis[question]['cost'],
-                'armor' : chasis[question]['armor'],
-                'health' : chasis[question]['health']
+                'material' : chasis_dict[question]['material'],
+                'cost' : chasis_dict[question]['cost'],
+                'armor' : chasis_dict[question]['armor'],
+                'health' : chasis_dict[question]['health']
             }
             return chasis
         else:
             print('Enter a number.')
     # End of select chasis
-def select_core():
-    print('Select a "Core", this will determine avalible energy.')
-    core = {
+
+bot_core_dict = {
     '1' : {
         'material' : 'Copper Battery',
         'cost' : 5,
@@ -220,26 +220,28 @@ def select_core():
         'energy' : 1000
     }
     }
-    for option in core:
-        player_select = core[option]
+def select_core():
+    global bot_core_dict
+    print('Select a "Core", this will determine avalible energy.')
+    for option in bot_core_dict:
+        player_select = bot_core_dict[option]
         cost = player_select['cost']
         material = player_select['material']
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in core:
+        if question in bot_core_dict:
             core = {
-                'material' : core[question]['material'],
-                'cost' : core[question]['cost'],
-                'energy' : core[question]['energy']
+                'material' : bot_core_dict[question]['material'],
+                'cost' : bot_core_dict[question]['cost'],
+                'energy' : bot_core_dict[question]['energy']
             }
             return core
         else:
             print('Enter a number.')
     # End of select core
-def select_engine():
-    print('Select a "Engine", this will determine attack and support stats.')
-    engine = {
+
+engine_dict = {
     '1' : {
         'material' : 'Toy',
         'cost' : 5,
@@ -266,23 +268,27 @@ def select_engine():
         'power' : 250
     }
     }
-    for option in engine:
-        player_select = engine[option]
+def select_engine():
+    global engine_dict
+    print('Select a "Engine", this will determine attack and support stats.')
+    for option in engine_dict:
+        player_select = engine_dict[option]
         cost = player_select['cost']
         material = player_select['material']
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in engine:
+        if question in engine_dict:
             engine = {
-                'material' : engine[question]['material'],
-                'cost' : engine[question]['cost'],
-                'power' : engine[question]['power'],
+                'material' : engine_dict[question]['material'],
+                'cost' : engine_dict[question]['cost'],
+                'power' : engine_dict[question]['power'],
             }
             return engine
         else:
             print('Enter a number.')
     # End of select engine
+
 def select_specialty():
     print('Bot specialty determines what a bot is made to do. But any bot can be any specialty.')
     specialties = {
@@ -404,6 +410,7 @@ def install_part():
 
 # - - - - - - - - - - - - - - - - - - - - -#-BOT PARTS! -#- - - - - - - - - - - - - - - - - - - - - #
 def apply_part(new_part, this_bot):
+    print(new_part)
     if new_part == 'Fencing Sword':
         this_bot['parts']['Fencing Sword'] = {
             'name' : 'Fencing Sword',
@@ -411,7 +418,6 @@ def apply_part(new_part, this_bot):
             'type' : 'attack',
             'damage' : 75
         }
-        print('Success!')
     elif new_part == 'Spinning Blade':
         this_bot['parts']['Spinning Blade'] = {
             'name' : 'Spinning Blade',
@@ -419,7 +425,6 @@ def apply_part(new_part, this_bot):
             'type' : 'attack',
             'damage' : 100
         }
-        print('Success!')
     elif new_part == 'Red Laser':
         this_bot['parts']['Red Laser'] = {
             'name' : 'Red Laser',
@@ -427,7 +432,6 @@ def apply_part(new_part, this_bot):
             'type' : 'attack',
             'damage' : 150
         }
-        print('Success!')
     
 
     elif new_part == 'Repair Nanites':
@@ -437,7 +441,6 @@ def apply_part(new_part, this_bot):
             'type' : 'heal',
             'healing' : 100
         }
-        print('Success!')
     elif new_part == 'System Analysis':
         this_bot['parts']['System Analysis'] = {
         'name' : 'System Analysis',
@@ -445,7 +448,6 @@ def apply_part(new_part, this_bot):
         'type' : 'heal',
         'healing' : 150
     }
-        print('Success!')
     elif new_part == 'Reboot':
         this_bot['parts']['Reboot'] = {
         'name' : 'Reboot',
@@ -453,7 +455,6 @@ def apply_part(new_part, this_bot):
         'type' : 'heal',
         'healing' : 200
     }
-        print('Success!')
 
 
     elif new_part == 'Raise Shield':
@@ -463,7 +464,6 @@ def apply_part(new_part, this_bot):
             'type' : 'block',
             'guard' : 25
         }
-        print('Success!')
     elif new_part == 'Energy Shields':
         this_bot['parts']['Energy Shields'] = {
             'name' : 'Energy Shields',
@@ -471,7 +471,6 @@ def apply_part(new_part, this_bot):
             'type' : 'block',
             'guard' : 50
         }
-        print('Success!')
 
 
     elif new_part == 'Guard':
@@ -480,16 +479,32 @@ def apply_part(new_part, this_bot):
             'description' : 'Taunt Foes',
             'type' : 'Special',
         }
-        print('Success!')
     elif new_part == 'Repair Nanite Swarm':
         this_bot['parts']['Repair Nanite Swarm'] = {
             'name' : 'Repair Nanite Swarm',
             'description' : 'Group Heal',
             'type' : 'Special',
         }
-        print('Success!')
+    
+    elif new_part == 'Overdrive':
+        this_bot['parts']['Overdrive'] = {
+            'name' : 'Overdrive',
+            'description' : 'buff friendly bot stats',
+            'type' : 'Special',
+        }
+    elif new_part == 'Crusher':
+        this_bot['parts']['Crusher'] = {
+            'name' : 'Crusher',
+            'description' : 'Sacrifice friendly bot, deal damage equal to scrap value of sacrificed bot',
+            'type' : 'Special',
+        }
+
+    else:
+        print(f'Error in function: apply_part, {new_part}part not in elif list ~406 - ~483')
+    # print only when player using
+    print('Success')
     # end of Apply Part
-def random_utility():
+def random_utility(team):
     '''Generates a random utility part from list'''
     utilities = [
         'Repair Nanites', 'Raise Shield', 'Reboot', 'Energy Shields', 'System Analysis', 'Guard', 'Repair Nanite Swarm'
@@ -509,10 +524,12 @@ def random_utility():
         rand = utilities[5]
     else:
         rand = utilities[6]
-    print(f'You got a: {rand}')
+    
+    if team == 'player':
+        print(f'You got a: {rand}')
     return rand
     # End of random utility
-def random_weapon():
+def random_weapon(team):
     '''Generates a random weapon part from list'''
     weapons = [
         'Fencing Sword', 'Spinning Blade', 'Red Laser'
@@ -524,13 +541,24 @@ def random_weapon():
         rand = weapons[1]
     else:
         rand = weapons[2]
-    print(f'You got a: {rand}')
+
+    if team == 'player':
+        print(f'You got a: {rand}')
     return rand
     # End of random Weapon
-def random_champion():
-    '''Generates a random champion part from list'''
-    rand = random.randint(1, 10)
-    print(f'You got a: {rand}')
+def random_champion(team):
+    '''Generates a random Champion part from list'''
+    utilities = [
+        'Crusher', 'Overclock'
+    ]
+    rand = random.randint(1, 2)
+    if rand < 2:
+        rand = utilities[0]
+    elif rand < 3:
+        rand = utilities[1]
+    
+    if team == 'player':
+        print(f'You got a: {rand}')
     return rand
     # End of random champion
 
@@ -554,9 +582,11 @@ def next_event():
             'A group of scouts are on the way, you ambush them!',
             'A momentary standoff starts as you run into a group of corrupt, you don\'t let them go first.',
             'You hear a loud sound approch, you hide, after it passes you set your eyes on a squadren that fell behind.',
-            'A new group of corrupt stop juuust outside of camp, you move in.'
+            'A new group of corrupt stop juuust outside of camp, you move in.',
+            'You take a breath, these couldv\'e been anorher swarm, but you are here now.',
+            'You approch distracted, one of the bots have an fresh apple in a storage compartment, "that one goes first", you decide.'
         ]
-        print(start_fight_quotes[random.randint(0, 4)])
+        print(start_fight_quotes[random.randint(0, len(start_fight_quotes) - 1)])
         events.append('Fight')
 
     get_time()
@@ -587,7 +617,7 @@ def next_event():
             'You follow the river upstream and find a pile of material collected at it\'s side.',
             'You return to a fight from a few days ago, some stuff has been untouched'
         ]
-        print(scavenge_quotes[random.randint(0, 6)])
+        print(scavenge_quotes[random.randint(0, len(scavenge_quotes) - 1)])
         scavenge()
     elif question == 'Install bot parts':
         install_part()
@@ -608,7 +638,7 @@ def next_event():
             'You hope your measly piles of scrap will somehow beat the swarm.',
             'Nothing disturbs you'
         ]
-        print(resting_quotes[random.randint(0, 8)])
+        print(resting_quotes[random.randint(0, len(resting_quotes) - 1)])
         print('Time flies by...')
         while game_time['hour'] != 9:
             get_time()
@@ -624,13 +654,13 @@ def scavenge():
             gain_scrap(500)
             break
         elif question == '2':
-            champion_parts.append(random_champion())
+            champion_parts.append(random_champion('player'))
             break
         elif question == '3':
-            utility_parts.append(random_utility())
+            utility_parts.append(random_utility('player'))
             break
         elif question == '4':
-            weapon_parts.append(random_weapon())
+            weapon_parts.append(random_weapon('player'))
             break
         else:
             print('Invalid input, material 1, 2, 3 or 4.')
@@ -643,8 +673,30 @@ def list_bots():
 
 
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
+'''    complete Bot example
+    ## - Bots cannot have same name while they are acitively in agrobots (Because it is a dictonary)
+    agro_bots['Blade Bot'] = {
+            'name' : 'Test Dummy',
+            'max_hp' : 100,
+            'hp' : 100,
+            'armor' : 25,
+            'power' : 100,
+            'energy' : 100,
+            'specialty' : 'Striker',
+            'parts' : {
+                'Spinning Blade': {
+                    'name' : 'Spinning Blade',
+                    'description' : 'T2 Attack',
+                    'type' : 'attack',
+                    'damage' : 100
+                }
+            }
+        }
+'''
+# - - - - - build - - - - - #
 def summon_evil_bots():
     global game_time
+    global agro_bots
     challenge_rating = game_time['day'] * 50 # Day > Hour
     challenge_rating += game_time['hour']
     challenge_rating += 49 # game starts at CR 100 (Unmodified)
@@ -652,28 +704,115 @@ def summon_evil_bots():
     if agro_count == 4:
         agro_count = 5
         challenge_rating /= 5
+        if challenge_rating < 50:
+            challenge_rating = 50
+    while agro_count != 0:
+        summon_this_agro_bot(challenge_rating)
+        agro_count -= 1
+
+def summon_this_agro_bot(bot_cr):
+    global chasis_dict
+    global bot_core_dict
+    global engine_dict
+
+    agro_bot_name_list = [
+        'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster 2 (The sequel to Toaster)'
+    ]
+    while True: # Ensure unique bot name
+        name = agro_bot_name_list[random.randint(0, len(agro_bot_name_list) - 1)]
+        if not name in agro_bots:
+            agro_bots[name] = {'name' : name, 'parts' : {}}
+            break
+
+    # - - Chasis
+    counter = 0
+    for option in chasis_dict:
+        if chasis_dict[option]['cost'] < bot_cr:
+            counter += 1
+        else:
+            break
+    if counter <= 1:
+        rand = '1'
+    else:
+        rand = str(random.randint(1, counter))
+
+    bot_cr -= chasis_dict[rand]['cost']
+    agro_bots[name]['hp'] = chasis_dict[rand]['health']
+    agro_bots[name]['max_hp'] = chasis_dict[rand]['health']
+    agro_bots[name]['armor'] = chasis_dict[rand]['armor']
+    bot_cr += 5 # Ensure bot has at least enough CR to build full bot
+
+    # - - Engine
+    counter = 0
+    for option in engine_dict:
+        if engine_dict[option]['cost'] < bot_cr:
+            counter += 1
+        else:
+            break
+    if counter <= 1:
+        rand = '1'
+    else:
+        rand = str(random.randint(1, counter))
+        
+    bot_cr -= engine_dict[rand]['cost']
+    agro_bots[name]['power'] = engine_dict[rand]['power']
+    bot_cr += 5 # Ensure bot has at least enough CR to build full bot
+
+    # - - Core
+    counter = 0
+    for option in bot_core_dict:
+        if bot_core_dict[option]['cost'] < bot_cr:
+            counter += 1
+        else:
+            break
+    if counter <= 1:
+        rand = '1'
+    else:
+        rand = str(random.randint(1, counter))
+        
+    bot_cr -= bot_core_dict[rand]['cost']
+    agro_bots[name]['energy'] = bot_core_dict[rand]['energy']
+    bot_cr += 5 # Ensure bot has at least enough CR to build full bot
+
+    # - - Specialty
+    specialties = { # Swarm and Support removed because they make the bots more RNG dependent as both as agro bots only add parts
+    0 : 'Striker', # Higher damage
+    1 : 'Defender', # Better armor and health
+    2 : 'Champion', # Allows champion parts to be equiped
+    }
+    agro_bots[name]['specialty'] = specialties[random.randint(0,2)]
     
+    if agro_bots[name]['specialty'] == 'Striker':
+        agro_bots[name]['power'] = agro_bots[name]['power'] * 1.5
+    elif agro_bots[name]['specialty'] == 'Defender':
+        agro_bots[name]['max_hp'] = agro_bots[name]['max_hp'] * 2
+        agro_bots[name]['hp'] = agro_bots[name]['hp'] * 2
+        agro_bots[name]['armor'] = agro_bots[name]['armor'] + 10
+
+    # - - parts
+    if agro_bots[name]['specialty'] == 'Champion': # If bot is champ give it another part
+        bot_cr += 100
+    apply_part(get_agro_parts(agro_bots[name]['specialty']), agro_bots[name]) # This part is here to ensure the bot can act
+    while bot_cr > 99 and len(agro_bots[name]['parts']) < 5:
+        apply_part(get_agro_parts(agro_bots[name]['specialty']), name)
+        bot_cr -= 100
 
 
+# - - - - - Battle - - - - - #
+def get_agro_parts(reciver_is_champ):
+    if reciver_is_champ == 'Champion':
+        reciver_is_champ = 6
+    else:
+        reciver_is_champ = 3
+    bot_part = random.randint(1, reciver_is_champ)
+    if int(bot_part) == 1:
+        bot_part = random_utility('agro')
+    elif int(bot_part) <= 3:
+        bot_part = random_weapon('agro')
+    elif int(bot_part) > 3:
+        bot_part = random_champion('agro')
+    return bot_part
 
-
-    # agro_bots['Blade Bot'] = {
-    #     'name' : 'Test Dummy',
-    #     'max_hp' : 100,
-    #     'hp' : 100,
-    #     'armor' : 25,
-    #     'power' : 100,
-    #     'energy' : 100,
-    #     'specialty' : 'Striker',
-    #     'parts' : {
-    #         'Spinning Blade': {
-    #             'name' : 'Spinning Blade',
-    #             'description' : 'T2 Attack',
-    #             'type' : 'attack',
-    #             'damage' : 100
-    #         }
-    #     }
-    # }
 def combat_cycle():
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     print('Combat has started')
@@ -690,6 +829,7 @@ def combat_cycle():
     while fighting:
         player_turn()
         print()
+        agro_bots_turn()
         print()
         if not agro_bots:
             print('You won the fight!')
@@ -705,9 +845,9 @@ def combat_cycle():
 def player_turn():
     print('It is your turn.')
     for character in player_bots:
+        foelist = []
         for foe in agro_bots:
-            foelist = []
-            list_item = f"{foe} : {agro_bots[foe]['hp']}"
+            list_item = f"{foe} : {agro_bots[foe]['hp']}hp"
             foelist.append(list_item)
         else:
             print()
@@ -742,8 +882,8 @@ def player_turn():
                 # End of error handle
                 part_use(player_bots, agro_bots, character, question)
                 print()
-    else:
-        print(f'{character}, has no parts to fight with!')
+        else:
+            print(f'{character}, has no parts to fight with!')
 # End of players turn functions
 
 def agro_bots_turn():
@@ -756,12 +896,16 @@ def agro_bots_turn():
         for option in agro_bots[character]['parts']:
             parts.append(option)
 
-        agro_action = random.randint(0, len(parts))
+        if len(parts) == 1:
+            agro_action = 0
+        else:
+            agro_action = random.randint(0, len(parts) - 1)
         agro_action = parts[agro_action]
         part_use(agro_bots, player_bots, character, agro_action)
     # End of agrobot turn
         
         # ------------ PART USE ------------
+
 def part_use(myteam, yourteam, user, part):
     print()
     targeting = True
