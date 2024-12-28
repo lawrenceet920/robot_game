@@ -411,6 +411,7 @@ def install_part():
 # - - - - - - - - - - - - - - - - - - - - -#-BOT PARTS! -#- - - - - - - - - - - - - - - - - - - - - #
 def apply_part(new_part, this_bot):
     print(new_part)
+
     if new_part == 'Fencing Sword':
         this_bot['parts']['Fencing Sword'] = {
             'name' : 'Fencing Sword',
@@ -486,7 +487,7 @@ def apply_part(new_part, this_bot):
             'type' : 'Special',
         }
     
-    elif new_part == 'Overdrive':
+    elif new_part == 'Overclock':
         this_bot['parts']['Overdrive'] = {
             'name' : 'Overdrive',
             'description' : 'buff friendly bot stats',
@@ -792,25 +793,29 @@ def summon_this_agro_bot(bot_cr):
     # - - parts
     if agro_bots[name]['specialty'] == 'Champion': # If bot is champ give it another part
         bot_cr += 100
-    apply_part(get_agro_parts(agro_bots[name]['specialty']), agro_bots[name]) # This part is here to ensure the bot can act
+    apply_part(get_agro_parts(name), agro_bots[name]) # This part is here to ensure the bot can act
     while bot_cr > 99 and len(agro_bots[name]['parts']) < 5:
-        apply_part(get_agro_parts(agro_bots[name]['specialty']), name)
+        apply_part(get_agro_parts(name), agro_bots[name])
         bot_cr -= 100
 
 
 # - - - - - Battle - - - - - #
-def get_agro_parts(reciver_is_champ):
-    if reciver_is_champ == 'Champion':
+def get_agro_parts(name):
+    if agro_bots[name]['specialty'] == 'Champion':
         reciver_is_champ = 6
     else:
         reciver_is_champ = 3
-    bot_part = random.randint(1, reciver_is_champ)
-    if int(bot_part) == 1:
-        bot_part = random_utility('agro')
-    elif int(bot_part) <= 3:
-        bot_part = random_weapon('agro')
-    elif int(bot_part) > 3:
-        bot_part = random_champion('agro')
+    while True:
+        bot_part = random.randint(1, reciver_is_champ)
+        if int(bot_part) == 1:
+            bot_part = random_utility('agro')
+        elif int(bot_part) <= 3:
+            bot_part = random_weapon('agro')
+        elif int(bot_part) > 3:
+            bot_part = random_champion('agro')
+
+        if not bot_part in agro_bots[name]['parts']:
+            break
     return bot_part
 
 def combat_cycle():
@@ -1037,6 +1042,7 @@ champion_parts = []
 taunt_list = {}
 # Game start
 player_name = input('What is your name: ')
+'''
 print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
 print('You have made it 50 miles deep into corrupted territory, You have to make your stand here, you go to sleep, your elite team by your side, you are ready!')
 print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents.')
@@ -1047,7 +1053,9 @@ gain_scrap(250)
 # time.sleep(0.5)
 print('\nYour old force needs to be put to use...')
 scavenge()
+'''
 
 while main_loop:
+    combat_cycle()
     next_event()
     print(f'Your bots: {list_bots()}')
