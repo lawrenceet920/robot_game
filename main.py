@@ -577,17 +577,6 @@ def next_event():
     if random.randint(1,4) == 1:
         events.append('Scavange for resources')
     else:
-        print('You decide that you need more supplies.')
-        start_fight_quotes = [
-            'You spot a group of corrupt, you move in.',
-            'A group of scouts are on the way, you ambush them!',
-            'A momentary standoff starts as you run into a group of corrupt, you don\'t let them go first.',
-            'You hear a loud sound approch, you hide, after it passes you set your eyes on a squadren that fell behind.',
-            'A new group of corrupt stop juuust outside of camp, you move in.',
-            'You take a breath, these couldv\'e been anorher swarm, but you are here now.',
-            'You approch distracted, one of the bots have an fresh apple in a storage compartment, "that one goes first", you decide.'
-        ]
-        print(start_fight_quotes[random.randint(0, len(start_fight_quotes) - 1)])
         events.append('Fight')
 
     get_time()
@@ -625,6 +614,19 @@ def next_event():
     elif question == 'Wait':
         print('Time passes by')
     elif question == 'Fight':
+        print('You decide that you need more supplies.')
+        time.sleep(0.5)
+        start_fight_quotes = [
+            'You spot a group of corrupt, you move in.',
+            'A group of scouts are on the way, you ambush them!',
+            'A momentary standoff starts as you run into a group of corrupt, you don\'t let them go first.',
+            'You hear a loud sound approch, you hide, after it passes you set your eyes on a squadren that fell behind.',
+            'A new group of corrupt stop juuust outside of camp, you move in.',
+            'You take a breath, these couldv\'e been anorher swarm, but you are here now.',
+            'You approch distracted, one of the bots have an fresh apple in a storage compartment, "that one goes first", you decide.'
+        ]
+        print(start_fight_quotes[random.randint(0, len(start_fight_quotes) - 1)])
+        time.sleep(0.75)
         combat_cycle()
     elif question == 'Sleep':
         print('You lay your head down.')
@@ -702,11 +704,9 @@ def summon_evil_bots():
     challenge_rating += game_time['hour']
     challenge_rating += 49 # game starts at CR 100 (Unmodified)
     agro_count = random.randint(1, 4)
-    if agro_count == 4:
-        agro_count = 5
-        challenge_rating /= 5
-        if challenge_rating < 50:
-            challenge_rating = 50
+    challenge_rating /= agro_count
+    if challenge_rating < 50:
+        challenge_rating = 50
     while agro_count != 0:
         summon_this_agro_bot(challenge_rating)
         agro_count -= 1
@@ -821,7 +821,7 @@ def get_agro_parts(name):
 def combat_cycle():
     global turn
     global taunt_list
-    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print('\n\n\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
     taunt_list = {}
     print('Combat has started')
     # Ensure player has bots
@@ -844,27 +844,37 @@ def combat_cycle():
         if not agro_bots:
             print('You won the fight!')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            time.sleep(1)
+            print('\n\n\n\n\n')
             scavenge()
             fighting = False
         elif not player_bots:
+            print('You ran out of bots, to fight with.')
             print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            time.sleep(1)
+            print('\n\n\n\n\n')
             fighting = False
             main_loop = False
     # End of combat cycle
         
 def player_turn():
+    print()
     print('It is your turn.')
+    print()
+    time.sleep(0.5)
     for character in player_bots:
+        time.sleep(0.2)
         foelist = []
         for foe in agro_bots:
             list_item = f"{foe} : {agro_bots[foe]['hp']}hp"
             foelist.append(list_item)
         else:
-            print()
             print('Aggressive bots:')
             print(foelist)
             print()
+        print('===========================')
         print(f"It is {character}'s turn.")
+        time.sleep(0.2)
         if 'guard' in player_bots[character]:
             del player_bots[character]['guard']
             print(f'{character} lowers their guard.')
@@ -890,14 +900,20 @@ def player_turn():
                     else:
                         print('Please enter a number.')
                 # End of error handle
-                part_use(player_bots, agro_bots, character, question)
                 print()
+                time.sleep(0.2)
+                part_use(player_bots, agro_bots, character, question)
         else:
             print(f'{character}, has no parts to fight with!')
+        print('===========================')
 # End of players turn functions
 
 def agro_bots_turn():
     for character in agro_bots:
+        time.sleep(0.5)
+        if not player_bots:
+            return
+        print('===========================')
         print(f"It is {character}'s turn.")
         if 'guard' in agro_bots[character]:
             del agro_bots[character]['guard']
@@ -912,13 +928,14 @@ def agro_bots_turn():
             agro_action = random.randint(0, len(parts) - 1)
         agro_action = parts[agro_action]
         part_use(agro_bots, player_bots, character, agro_action)
+        print('===========================')
+    time.sleep(0.5)
     # End of agrobot turn
         
         # ------------ PART USE ------------
 
 def part_use(myteam, yourteam, user, part):
     global taunt_list
-    print()
     part_stats = myteam[user]['parts'][part]
     if part_stats['type'] == 'attack':
         damage = part_stats['damage']
@@ -955,7 +972,6 @@ def part_use(myteam, yourteam, user, part):
             taunt_list[myteam[user]['name']]
         else:
             print('This special part has no coded use yet! (sorry)')
-    print()
 # End of part Use
 
 def check_life(team, character):
@@ -1062,7 +1078,7 @@ taunt_list = {}
 turn = True # True is playerturn
 # Game start
 player_name = input('What is your name: ')
-'''
+
 print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
 print('You have made it 50 miles deep into corrupted territory, You have to make your stand here, you go to sleep, your elite team by your side, you are ready!')
 print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents.')
@@ -1073,9 +1089,12 @@ gain_scrap(250)
 # time.sleep(0.5)
 print('\nYour old force needs to be put to use...')
 scavenge()
-'''
+
 
 while main_loop:
-    combat_cycle()
-    next_event()
     print(f'Your bots: {list_bots()}')
+    next_event()
+time.sleep(1)
+print('Oh. oh no...')
+time.sleep(1)
+print('Game over!')
