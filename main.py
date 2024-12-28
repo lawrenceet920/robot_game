@@ -814,7 +814,9 @@ def get_agro_parts(reciver_is_champ):
     return bot_part
 
 def combat_cycle():
+    global taunt_list
     print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    taunt_list = {}
     print('Combat has started')
     # Ensure player has bots
     global main_loop
@@ -907,31 +909,13 @@ def agro_bots_turn():
         # ------------ PART USE ------------
 
 def part_use(myteam, yourteam, user, part):
+    global taunt_list
     print()
-    targeting = True
     part_stats = myteam[user]['parts'][part]
     if part_stats['type'] == 'attack':
         damage = part_stats['damage']
         damage = damage * myteam[user]['power'] / 100 
-        print('Pick a target for the attack.')
-        counter = 0
-        bot_list = []
-        for bot in yourteam:
-            counter += 1
-            bot_list.append(bot)
-            print(f"{counter} : {bot}")
-        while targeting:
-            question = input('Awaiting input: ')
-            if question.isdigit():
-                question = int(question) - 1
-                if -1 < question < counter:
-                    target = bot_list[question]
-                    targeting = False
-                else:
-                    print('Please enter a valid number.')
-            else:
-                print('Please enter a number.')
-            # End of targeting
+        targeting_ability(myteam, yourteam, False)
         damage -= yourteam[target]['armor']
         if 'guard' in yourteam[target]:
             damage -= yourteam[target]['guard']
@@ -943,19 +927,7 @@ def part_use(myteam, yourteam, user, part):
     elif part_stats['type'] == 'heal':
         heal = part_stats['healing']
         heal = heal * myteam[user]['power'] / 100 
-
-        print('Pick a target for the healing.')
-        counter = 1
-        bot_list = []
-        for bot in myteam:
-            bot_list.append(bot)
-            print(f"{counter} : {bot}")
-            counter += 1
-        while targeting:
-            question = input('Awaiting input: ')
-            if question.isdigit():
-                target = bot_list[int(question) - 1]
-            # End of targeting
+        target = targeting_ability(myteam, yourteam, True)
         myteam[target]['hp'] += {heal}
         if myteam[target]['hp'] > myteam[target]['max_hp']:
             myteam[target]['hp'] = myteam[target]['max_hp']
@@ -968,15 +940,67 @@ def part_use(myteam, yourteam, user, part):
         print(f'{user} braces for {guard:.1f} additional damage.')
 
     elif part_stats['type'] == 'special':
-        print('This special part has no coded use yet! (sorry)')
+        if part_stats['name'] == 'Guard':
+            taunt_list[myteam[user]['name']]
+        else:
+            print('This special part has no coded use yet! (sorry)')
     print()
 # End of part Use
 
 def check_life(team, character):
     if team[character]['hp'] < 1:
         print(f'{character} has been destroyed!')
+        if team[character]['name'] in taunt_list:
+            del taunt_list[team[character]['name']]
         del team[character]
 
+# Part specific functions
+def targeting_ability(myteam, yourteam, is_positive_ability):
+    global taunt_list
+    if is_positive_ability:
+        print('Pick a target for the attack.')
+        counter = 0
+        bot_list = []
+        for bot in myteam:
+            counter += 1
+            bot_list.append(bot)
+            print(f"{counter} : {bot}")
+        while True:
+            question = input('Awaiting input: ')
+            if question.isdigit():
+                question = int(question) - 1
+                if -1 < question < counter:
+                    return bot_list[question]
+                else:
+                    print('Please enter a valid number.')
+            else:
+                print('Please enter a number.')
+    else:
+        taunted = False
+        if taunt_list:
+            for character in taunt_list:
+                if character not in myteam:
+                    taunted = True
+        if taunted:
+            print('taunted')
+        else:
+            print('Pick a target for the attack.')
+            counter = 0
+            bot_list = []
+            for bot in yourteam:
+                counter += 1
+                bot_list.append(bot)
+                print(f"{counter} : {bot}")
+            while True:
+                question = input('Awaiting input: ')
+                if question.isdigit():
+                    question = int(question) - 1
+                    if -1 < question < counter:
+                        return bot_list[question]
+                    else:
+                        print('Please enter a valid number.')
+                else:
+                    print('Please enter a number.')
 # --- Variables --- #
 game_time = {
     'day' : 1,
@@ -1009,6 +1033,8 @@ agro_bots = {}
 utility_parts = []
 weapon_parts = ['Red Laser']
 champion_parts = []
+# Battle globals
+taunt_list = {}
 # Game start
 player_name = input('What is your name: ')
 print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
