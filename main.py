@@ -8,7 +8,9 @@ Fight final boss
 Select special event (clone a bot, buff a bot, scrap pile, sell a bot, Theft, bot specific mission {drill part can mine})
 rest encounters?
 """
-
+RANDOM_BOT_NAME_LIST = [
+    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster)', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer'
+]
 
 def gain_scrap(amount):
     global scrap
@@ -47,11 +49,14 @@ def get_time():
 # - - - - - - - - - - - - - - - - - - - - -#- BUILD BOT -#- - - - - - - - - - - - - - - - - - - - - #
 
 def build_bot():
+    global RANDOM_BOT_NAME_LIST
     global scrap
     global player_bots
+    global player_exp
     cost = 100
-    print()
-
+    print('\n\n\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    print(f'You have {scrap} Scrap, the base cost of a bot is 100.')
+    print('Your bot will also need a: Chasis, Core, and Engine.')
     chasis = select_chasis()
     cost += chasis['cost']
     print()
@@ -68,11 +73,19 @@ def build_bot():
     print()
 
     while True:
-        name = input('Name your bot:    ')
-        if name not in player_bots:
+        name = input('Name your bot, or type "r" to use a random name:    ')
+        if name == 'r':
+            while True: # Generate random (Unused)name 
+                name = RANDOM_BOT_NAME_LIST[random.randint(0, len(RANDOM_BOT_NAME_LIST) - 1)]
+                if name not in player_bots:
+                    print(f'name chosen: {name}')
+                    break
+            break
+        elif name not in player_bots:
             break
         else:
             print('Please use a unique name.')
+    print()
     bot_loadout = {
         'name' : name,
         'max_hp' : chasis['health'],
@@ -83,9 +96,6 @@ def build_bot():
         'specialty' : specialty,
         'parts' : {}
     }
-
-    print(f"This robot specialises in {specialty} and is will use these parts")
-    print(f"Chasis : {chasis['material']} | Core : {core['material']} | Engine : {engine['material']}")
     if specialty == 'Swarmer':
         cost -= cost / 2
     elif specialty == 'Striker':
@@ -94,17 +104,29 @@ def build_bot():
         bot_loadout['max_hp'] = bot_loadout['max_hp'] * 2
         bot_loadout['hp'] = bot_loadout['hp'] * 2
         bot_loadout['armor'] = bot_loadout['armor'] + 10
+    bot_loadout['scrap value'] = cost
 
+    print(f"This robot specialises in {specialty} and is will use these parts")
+    print(f"Chasis : {chasis['material']} | Core : {core['material']} | Engine : {engine['material']}")
+
+    print(f'This bot will cost {cost} scrap to construct.')
     if scrap >= cost:
-        print('Type y to build the robot?')
+        print('Type y to build the robot.')
         question = input('Awaiting input: ')
         if question in ['y', 'Y', 'Yes', 'yes']:
             player_bots[name] = bot_loadout
             scrap -= cost
+            if player_exp != '3':
+                print('---------------\nYou have finished building this bot, make sure to install parts to give them functionality\n---------------')
+                time.sleep(1)
+            else:
+                print('Bot construction finished.')
     else: 
         print('You do not have enough scrap to build this.')
         time.sleep(1)
     print('Exiting build mode.')
+    time.sleep(2)
+    print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n\n\n\n')
     # End of build bot
 # Selecting bot parts
 
@@ -284,29 +306,39 @@ def select_specialty():
 
 def install_part():
     global player_bots
-    print("Pick a robot, or type 'quit' to quit (Capitalisation matters)")
-    counter = 1
-    bot_list = []
-    for bot in player_bots:
-        bot_list.append(bot)
-        print(f"{counter} : {bot}")
-        counter += 1
-    question = input('Awaiting input: ')
-    if question.isdigit():
-        question = bot_list[int(question) - 1]
-    if question in ['quit', 'Quit', 'QUIT']:
-        return
-    elif question in player_bots:
-        selected_bot = player_bots[question] # Bot found
-        specialty = selected_bot['specialty'] # Specialty found
-        if specialty == 'Support': # Support?
-            allowed_parts = 6
-        else: 
-            allowed_parts = 4
-        if specialty == 'Champion': # Champion?
-            champ = True
-        else:
-            champ = False
+    while True:
+        pick_bot = True
+        while pick_bot:
+            print("Pick a robot, or type 'quit' to quit (Capitalisation matters)")
+            counter = 1
+            bot_list = []
+            for bot in player_bots:
+                bot_list.append(bot)
+                print(f"{counter} : {bot}")
+                counter += 1
+            question = input('Awaiting input: ')
+            if question.isdigit():
+                question = int(question) - 1
+                if -1 < question < len(bot_list):
+                    question = bot_list[question]
+                else:
+                    print('number not in range \n')
+            elif question in ['quit', 'Quit', 'QUIT']:
+                return
+            
+            if question in player_bots:
+                print('\n\n\n')
+                selected_bot = player_bots[question] # Bot found
+                specialty = selected_bot['specialty'] # Specialty found
+                if specialty == 'Support': # Support?
+                    allowed_parts = 6
+                else: 
+                    allowed_parts = 4
+                if specialty == 'Champion': # Champion?
+                    champ = True
+                else:
+                    champ = False
+                pick_bot = False
         
         print(f"You are installing parts in: {question}. Specialty : {specialty}")
         total_parts = 0 # Find part count
@@ -329,58 +361,57 @@ def install_part():
                     print('Current owned parts:')
                     counter = 1
                     part_list = []
-                    if weapon_parts:
-                        print('\nWeapon Part List: ')
-                        for part in weapon_parts:
-                            print(f'{counter} : {part}')
-                            part_list.append(part)
-                            counter += 1
-                    if utility_parts:
-                        print('\nUtility Part List: ')
-                        for part in utility_parts:
-                            print(f'{counter} : {part}')
-                            part_list.append(part)
-                            counter += 1
-                    if champion_parts and champ: # List parts
+                    for unused_part in weapon_parts:
+                        print(f'{counter} : {unused_part}')
+                        part_list.append(unused_part)
+                        counter += 1
+                    for unused_part in utility_parts:
+                        print(f'{counter} : {unused_part}')
+                        part_list.append(unused_part)
+                        counter += 1
+                    if champ: # List parts
                         print('\nChampion Part List: ')
-                        for part in champion_parts:
-                            print(f'{counter} : {part}')
-                            part_list.append(part)
+                        for unused_part in champion_parts:
+                            print(f'{counter} : {unused_part}')
+                            part_list.append(unused_part)
                             counter += 1
                     # Stop listing
+
                     print() 
                     question = input('Awaiting input: ')
                     if question.isdigit:
                         question = int(question) - 1
-                        question = part_list[question]
-                        if question in selected_bot['parts']:
-                            print('Part is already in the bot.')
-                            return
-                        print('Part found! installing...')
-                        if champ:
-                            for part in champion_parts:
+                        if -1 < question < len(part_list):
+                            question = part_list[question]
+                            if question in selected_bot['parts']:
+                                print('Part is already in the bot.')
+                                return
+                            print('Part found! installing...')
+                            if champ:
+                                for part in champion_parts:
+                                    if part == question:
+                                        champion_parts.remove(part)
+                                        apply_part(part, selected_bot, True)
+                                        installing = False
+                            for part in utility_parts:
                                 if part == question:
-                                    champion_parts.remove(part)
+                                    utility_parts.remove(part)
                                     apply_part(part, selected_bot, True)
                                     installing = False
-                        for part in utility_parts:
-                            if part == question:
-                                utility_parts.remove(part)
-                                apply_part(part, selected_bot, True)
-                                return
-                        for part in weapon_parts:
-                            if part == question:
-                                weapon_parts.remove(part)
-                                apply_part(part, selected_bot, True)
-                                return
+                            for part in weapon_parts:
+                                if part == question:
+                                    weapon_parts.remove(part)
+                                    apply_part(part, selected_bot, True)
+                                    installing = False
+                        else:
+                            print('Part not in range')
                     elif question.lower == 'quit':
                         installing = False
                     else:
                         print('part not found.')
-                else:
-                    installing = False
-        else:
-            print('Exiting')
+            else:
+                print('Bot has maxed equipped parts (Support bots can equip more parts)')
+        print('\n\n')
     # End Of installing parts
 
 # - - - - - - - - - - - - - - - - - - - - -#-BOT PARTS! -#- - - - - - - - - - - - - - - - - - - - - #
@@ -451,20 +482,20 @@ def apply_part(new_part, this_bot, isplayer):
     elif new_part == 'Guard':
         this_bot['parts']['Guard'] = {
             'name' : 'Guard',
-            'description' : 'Taunt Foes',
+            'description' : 'Taunt foes, until end of combat, or bot dies. While taunted, foes can only attack bots that have taunted.',
             'type' : 'Special',
         }
     elif new_part == 'Repair Nanite Swarm':
         this_bot['parts']['Repair Nanite Swarm'] = {
             'name' : 'Repair Nanite Swarm',
-            'description' : 'Group Heal',
+            'description' : 'Heal all friendly bots',
             'type' : 'Special',
         }
     
-    elif new_part == 'Overclock':
-        this_bot['parts']['Overdrive'] = {
-            'name' : 'Overdrive',
-            'description' : 'buff friendly bot stats',
+    elif new_part == 'Rally':
+        this_bot['parts']['Rally'] = {
+            'name' : 'Rally',
+            'description' : 'buff friendly bot attacks for rest of comabt',
             'type' : 'Special',
         }
     elif new_part == 'Crusher':
@@ -475,10 +506,18 @@ def apply_part(new_part, this_bot, isplayer):
         }
 
     else:
-        print(f'Error in function: apply_part, {new_part}part not in elif list ~406 - ~483')
+        print(f'Error in function: apply_part, {new_part}part not in list')
     # print only when player using
     if isplayer:
         print('Success')
+        bot_name = this_bot['parts'][new_part]['name']
+        bot_description = this_bot['parts'][new_part]['description']
+        print('part info:')
+        if this_bot['parts'][new_part]['type'] == 'Special':
+            print(f'{bot_name} will {bot_description}')
+        else:
+            print(f'{bot_name} is a {bot_description}')
+        time.sleep(1)
     # end of Apply Part
 def random_utility(team):
     '''Generates a random utility part from list'''
@@ -525,7 +564,7 @@ def random_weapon(team):
 def random_champion(team):
     '''Generates a random Champion part from list'''
     utilities = [
-        'Crusher', 'Overclock'
+        'Crusher', 'Rally'
     ]
     rand = random.randint(1, 2)
     if rand < 2:
@@ -543,10 +582,11 @@ def random_champion(team):
 def next_event():
     global game_time
     # Defualt event list (Always available)
-    events = ['wait', 'Build bot']
+    events = ['Build bot']
     # Conditional events
     if 20 < game_time['hour'] or game_time['hour'] < 4: 
-        events.append('Sleep')
+        if not 8 < game_time['sleep']:
+            events.append('Sleep')
     elif 0 > game_time['sleep']:
         events.append('Sleep')
     if len(player_bots) >= 1:
@@ -559,9 +599,11 @@ def next_event():
         events.append('Scavange for resources')
     else:
         events.append('Fight')
+    if player_name == 'E':
+        events.append('wait')
 
     get_time()
-    if 0 < game_time['sleep']:
+    if 0 > game_time['sleep']:
         print('\nWhat now do you do now? I hopes its is sleeps')
     else:
         print('\nWhat do you do now?')
@@ -581,11 +623,13 @@ def next_event():
             print('Please type a number.')
     print()
     if question == 'Build bot':
+        print('You decide that you need more bots.')
+        time.sleep(0.5)
         build_bot()
     elif question == 'Repair bots':
         repair_bots()
     elif question == 'Scavange for resources':
-        scavenge_quotes = [
+        SCAVENGE_QUOTES = [
             'You spot a pile of rubble, score!',
             'Somehow you missed a group of corrupt arrive, lucky you however, they are powered down!',
             'You check on your water filter by the river and harvest out all the usable material',
@@ -593,16 +637,18 @@ def next_event():
             'You follow the river upstream and find a pile of material collected at it\'s side.',
             'You return to a fight from a few days ago, some stuff has been untouched'
         ]
-        print(scavenge_quotes[random.randint(0, len(scavenge_quotes) - 1)])
+        print(SCAVENGE_QUOTES[random.randint(0, len(SCAVENGE_QUOTES) - 1)])
         scavenge()
     elif question == 'Install bot parts':
+        print('You prepare to install your bot parts.')
+        time.sleep(0.5)
         install_part()
     elif question == 'Wait':
         print('Time passes by')
     elif question == 'Fight':
         print('You decide that you need more supplies.')
         time.sleep(0.5)
-        start_fight_quotes = [
+        START_FIGHT_QUOTES = [
             'You spot a group of corrupt, you move in.',
             'A group of scouts are on the way, you ambush them!',
             'A momentary standoff starts as you run into a group of corrupt, you don\'t let them go first.',
@@ -611,12 +657,12 @@ def next_event():
             'You take a breath, these couldv\'e been anorher swarm, but you are here now.',
             'You approch distracted, one of the bots have an fresh apple in a storage compartment, "that one goes first", you decide.'
         ]
-        print(start_fight_quotes[random.randint(0, len(start_fight_quotes) - 1)])
+        print(START_FIGHT_QUOTES[random.randint(0, len(START_FIGHT_QUOTES) - 1)])
         time.sleep(0.75)
         combat_cycle()
     elif question == 'Sleep':
         print('You lay your head down.')
-        resting_quotes = [
+        RESTING_QUOTES = [
             'A cold breeze takes out your fire, you shiver to keep warm.',
             'An animal passes your tent, you don\'t know if you should feel worried or better protected.',
             'It begins to rain, you are grateful your tent can\'t be corrupted.',
@@ -627,7 +673,7 @@ def next_event():
             'You hope your measly piles of scrap will somehow beat the swarm.',
             'Nothing disturbs you'
         ]
-        print(resting_quotes[random.randint(0, len(resting_quotes) - 1)])
+        print(RESTING_QUOTES[random.randint(0, len(RESTING_QUOTES) - 1)])
         print('Time flies by...')
         while game_time['hour'] != 9:
             get_time()
@@ -663,7 +709,7 @@ def list_bots():
     global player_bots
     names = []
     for bot in player_bots:
-        names.append(bot)
+        names.append(player_bots[bot]['name'])
     return names
 
 def repair_bots():
@@ -734,15 +780,15 @@ def summon_this_agro_bot(bot_cr):
     global chasis_dict
     global bot_core_dict
     global engine_dict
-
-    agro_bot_name_list = [
-        'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster 2 (The sequel to Toaster)'
-    ]
+    global RANDOM_BOT_NAME_LIST
     while True: # Ensure unique bot name
-        name = agro_bot_name_list[random.randint(0, len(agro_bot_name_list) - 1)]
+        name = RANDOM_BOT_NAME_LIST[random.randint(0, len(RANDOM_BOT_NAME_LIST) - 1)]
         if not name in agro_bots:
-            agro_bots[name] = {'name' : name, 'parts' : {}}
-            break
+            if not name in player_bots:
+                agro_bots[name] = {'name' : name, 'parts' : {}}
+                break
+    
+    agro_bots[name]['scrap value'] = 0
 
     # - - Chasis
     counter = 0
@@ -756,6 +802,7 @@ def summon_this_agro_bot(bot_cr):
     else:
         rand = str(random.randint(1, counter))
 
+    agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
     bot_cr -= chasis_dict[rand]['cost']
     agro_bots[name]['hp'] = chasis_dict[rand]['health']
     agro_bots[name]['max_hp'] = chasis_dict[rand]['health']
@@ -774,6 +821,7 @@ def summon_this_agro_bot(bot_cr):
     else:
         rand = str(random.randint(1, counter))
         
+    agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
     bot_cr -= engine_dict[rand]['cost']
     agro_bots[name]['power'] = engine_dict[rand]['power']
     bot_cr += 5 # Ensure bot has at least enough CR to build full bot
@@ -790,6 +838,7 @@ def summon_this_agro_bot(bot_cr):
     else:
         rand = str(random.randint(1, counter))
         
+    agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
     bot_cr -= bot_core_dict[rand]['cost']
     agro_bots[name]['energy'] = bot_core_dict[rand]['energy']
     bot_cr += 5 # Ensure bot has at least enough CR to build full bot
@@ -838,6 +887,7 @@ def get_agro_parts(name):
     return bot_part
 
 def combat_cycle():
+    global damage_modifications
     global turn
     global taunt_list
     print('\n\n\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
@@ -874,6 +924,12 @@ def combat_cycle():
             print('\n\n\n\n\n')
             fighting = False
             main_loop = False
+    damage_modifications = {
+    'player add' : 0,
+    'player mult' : 1,
+    'corrupt add' : 0,
+    'corrupt mult' : 1
+}
     # End of combat cycle
         
 def player_turn():
@@ -955,18 +1011,24 @@ def agro_bots_turn():
 
 def part_use(myteam, yourteam, user, part):
     global taunt_list
+    global damage_modifications
     part_stats = myteam[user]['parts'][part]
     if part_stats['type'] == 'attack':
-        damage = part_stats['damage']
-        print(f'Base damage {damage}')
-        damage += damage * myteam[user]['power'] / 100 
-        print(f'Power {damage}')
         target = targeting_ability(myteam, yourteam, False)
+
+        damage = part_stats['damage']
+        damage += damage * myteam[user]['power'] / 100 
+        
+        if myteam == player_bots:
+            damage += damage_modifications['player add']
+            damage *= damage_modifications['player mult']
+        else:
+            damage += damage_modifications['corrupt add']
+            damage *= damage_modifications['player mult']
+
         damage -= yourteam[target]['armor']
         if 'guard' in yourteam[target]:
             damage -= yourteam[target]['guard']
-        print(f'After armor {damage}')
-        
         yourteam[target]['hp'] -= damage
         print(f'{user} attacks {target} for {damage:.1f} damage.')
         check_life(yourteam, target)
@@ -989,6 +1051,24 @@ def part_use(myteam, yourteam, user, part):
     elif part_stats['type'] == 'special':
         if part_stats['name'] == 'Guard':
             taunt_list[myteam[user]['name']]
+        elif part_stats['name'] == 'Crusher':
+            print('Pick bot to destroy for base damage')
+            target = targeting_ability(myteam, yourteam, True)
+            myteam[target]['hp'] -= myteam[target]['hp']
+            print(f'{user} crushes {target}')
+            damage = myteam[target]['scrap value']
+            check_life(myteam, target)
+
+            print('Pick bot to attack')
+            target = targeting_ability(myteam, yourteam, False)
+            yourteam[target]['hp'] -= damage
+            print(f'{user} attacks {target} for {damage:.1f} damage.')
+        elif part_stats['name'] == 'Rally':
+            print(f'{user} rallys their allies, + 10% damage multiplier')
+            if myteam == player_bots:
+                damage_modifications['player mult'] += 0.1
+            else:
+                damage_modifications['corrupt mult'] += 0.1
         else:
             print('This special part has no coded use yet! (sorry)')
 # End of part Use
@@ -1001,14 +1081,14 @@ def check_life(team, character):
         del team[character]
 
 # Part specific functions
-def targeting_ability(myteam, yourteam, is_positive_ability):
+def targeting_ability(myteam, yourteam, target_my_team):
     global taunt_list
     global turn
     taunted = False 
 
-    if is_positive_ability:
+    if target_my_team:
         if turn:
-            print('Pick a target for the attack.')
+            print('Pick a target for the ability.')
         counter = 0
         bot_list = []
         for bot in myteam:
@@ -1069,11 +1149,41 @@ game_time = {
 main_loop = True
 scrap = 0
 # Bots
-player_bots = {
-    'Test Dummy' : {
+player_bots = {}
+agro_bots = {}
+utility_parts = []
+weapon_parts = []
+champion_parts = []
+# Battle globals
+taunt_list = {}
+damage_modifications = {
+    'player add' : 0,
+    'player mult' : 1,
+    'corrupt add' : 0,
+    'corrupt mult' : 1
+}
+turn = True # True is playerturn
+# Game start
+while True:
+    print('How much have you played this game? (Enter the number to the left of the ":")')
+    print('1 : Never, full tutorial')
+    print('2 : Some, remove tutorials')
+    print('3 : A lot, remove tutorial, and reduce wait time, and flavor text')
+    player_exp = input('Awaiting input:\n')
+    if player_exp == '3':
+        game_speed = 2
+        break
+    elif player_exp in ['1', '2']:
+        game_speed = 1
+        break
+    else:
+        print('Input must be either "1" "2", or "3"\n')
+player_name = input('What is your name: ')
+if player_name == 'E': # Remove this
+    player_bots ['Test Dummy'] = {
         'name' : 'Test Dummy',
         'max_hp' : 100,
-        'hp' : 50,
+        'hp' : 100,
         'armor' : 25,
         'power' : 100,
         'energy' : 100,
@@ -1087,29 +1197,36 @@ player_bots = {
             }
         }
     }
-    }
-agro_bots = {}
-utility_parts = []
-weapon_parts = ['Red Laser']
-champion_parts = []
-# Battle globals
-taunt_list = {}
-turn = True # True is playerturn
-# Game start
-player_name = input('What is your name: ')
+# Introduction
 
-print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
-print('You have made it 50 miles deep into corrupted territory, Scrap sticks out of the scorched earth and flows down the rivers, life is still here, but only faintly.')
-print('You have to make your stand here, you set up camp, go to sleep, your elite team by your side, you are ready!')
-print('You wake up to see your force destroyed, the telltale signs of a powerful emp mark the combatents.')
-print('You take a look at them, even if they repower it won\'t be in time.')
-time.sleep(1)
-print('You scrap the corrupted robots, you\'ll need all the materials you can get.')
-gain_scrap(250)
+if player_exp == '1':
+    print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
+    time.sleep(2)
+    print('You have made it 50 miles deep into corrupted territory, Scrap sticks out of the scorched earth and flows down the rivers, life is still here, but only faintly.')
+    time.sleep(2)
+    print('You have to make your stand here, you set up camp, go to sleep, your elite team by your side, you are ready!')
+    time.sleep(2)
+    print('You wake up to see your force destroyed, a huge force has had a large battle last night.')
+    time.sleep(2)
+    print('You judge that this was the main army and all that could be left of this assault are smaller groups and their commander.')
+    time.sleep(2)
+    print('You check local energy readings. compaired to last night you have about 10 days until the commander arrives.')
+    time.sleep(2)
+    print('If you can take out the commander they will be too divided and disorginised for this assault to work.')
+    time.sleep(2)
+    print('You scrap the corrupted robots, you\'ll need all the materials you can get.\n')
+    time.sleep(2)
+gain_scrap(500)
+utility_parts.append(random_utility('player'))
+weapon_parts.append(random_weapon('player'))
+champion_parts.append(random_champion('player'))
 time.sleep(0.5)
-print('\nYour old force needs to be put to use...')
+print('\nYour old force also needs to be put to use...')
+scavenge()
 scavenge()
 
+if player_exp == '1':
+    print('Your bots were just wreaked, you should build a bot quickly before you get attacked so you can defend yourself.')
 
 while main_loop:
     print(f'Your bots: {list_bots()}')
