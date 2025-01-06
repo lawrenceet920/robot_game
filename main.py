@@ -379,7 +379,7 @@ def install_part():
 
                     print() 
                     question = input('Awaiting input: ')
-                    if question.isdigit:
+                    if question.isdigit():
                         question = int(question) - 1
                         if -1 < question < len(part_list):
                             question = part_list[question]
