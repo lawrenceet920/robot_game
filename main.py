@@ -103,7 +103,7 @@ def build_bot():
     elif specialty == 'Defender':
         bot_loadout['max_hp'] = bot_loadout['max_hp'] * 2
         bot_loadout['hp'] = bot_loadout['hp'] * 2
-        bot_loadout['armor'] = bot_loadout['armor'] + 10
+        bot_loadout['armor'] = bot_loadout['armor'] + 50
     bot_loadout['scrap value'] = cost
 
     print(f"This robot specialises in {specialty} and is will use these parts")
@@ -135,37 +135,37 @@ chasis_dict = {
         'material' : 'Wooden',
         'cost' : 50,
         'armor' : 0,
-        'health' : 100
+        'health' : 300
     },
     '2' : {
         'material' : 'Stone',
         'cost' : 75,
-        'armor' : 10,
-        'health' : 100
+        'armor' : 50,
+        'health' : 300
     },
     '3' : {
         'material' : 'Scrap Iron',
         'cost' : 150,
-        'armor' : 15,
-        'health' : 250
+        'armor' : 100,
+        'health' : 500
     },
     '4' : {
         'material' : 'Glass',
         'cost' : 150,
-        'armor' : 100,
+        'armor' : 300,
         'health' : 1
     },
     '5' : {
         'material' : 'Iron',
         'cost' : 250,
-        'armor' : 25,
-        'health' : 500
+        'armor' : 150,
+        'health' : 750
     },
     '6' : {
         'material' : 'Steel',
         'cost' : 500,
-        'armor' : 50,
-        'health' : 1000
+        'armor' : 250,
+        'health' : 2500
     }
     }
 def select_chasis():
@@ -207,19 +207,19 @@ bot_core_dict = {
         'energy' : 250
     },
     '4' : {
-        'material' : 'Green',
+        'material' : 'Hydrogen',
         'cost' : 200,
         'energy' : 500
     },
     '5' : {
-        'material' : 'Hydrogen',
+        'material' : 'Nuclear',
         'cost' : 500,
-        'energy' : 1000
+        'energy' : 10000
     }
     }
 def select_core():
     global bot_core_dict
-    print('Select a "Core", this will determine avalible energy.')
+    print('Select a "Core", this will determine avalible energy (Parts passively use energy).')
     for option in bot_core_dict:
         player_select = bot_core_dict[option]
         cost = player_select['cost']
@@ -256,12 +256,12 @@ engine_dict = {
     },
     '4' : {
         'material' : 'Truck',
-        'cost' : 200,
+        'cost' : 250,
         'power' : 150
     },
     '5' : {
         'material' : 'Jet',
-        'cost' : 500,
+        'cost' : 750,
         'power' : 250
     }
     }
@@ -306,6 +306,7 @@ def select_specialty():
 
 def install_part():
     global player_bots
+    global ALL_PARTS
     while True:
         pick_bot = True
         while pick_bot:
@@ -328,8 +329,8 @@ def install_part():
             
             if question in player_bots:
                 print('\n\n\n')
-                selected_bot = player_bots[question] # Bot found
-                specialty = selected_bot['specialty'] # Specialty found
+                selected_bot = question # Bot found
+                specialty = player_bots[selected_bot]['specialty'] # Specialty found
                 if specialty == 'Support': # Support?
                     allowed_parts = 6
                 else: 
@@ -352,28 +353,30 @@ def install_part():
         while installing:
             if total_parts < allowed_parts:
                 print("current installed parts:")
-                if not selected_bot['parts']:
+                if not player_bots[selected_bot]['parts']:
                     print('No parts installed')
                 for part in selected_bot['parts']:
                     print(part)
                 print()
                 while installing:
                     print('Type in the part number you want to install, or "quit" to quit.')
+                    energy = player_bots[selected_bot]['energy']
+                    print(f"Remaining energy: {energy}00 Watts")
                     print('Current owned parts:')
                     counter = 1
                     part_list = []
                     for unused_part in weapon_parts:
-                        print(f'{counter} : {unused_part}')
+                        print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]}00 Watts')
                         part_list.append(unused_part)
                         counter += 1
                     for unused_part in utility_parts:
-                        print(f'{counter} : {unused_part}')
+                        print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]}00 Watts')
                         part_list.append(unused_part)
                         counter += 1
                     if champ: # List parts
                         print('\nChampion Part List: ')
                         for unused_part in champion_parts:
-                            print(f'{counter} : {unused_part}')
+                            print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]}00 Watts')
                             part_list.append(unused_part)
                             counter += 1
                     # Stop listing
@@ -421,113 +424,112 @@ ALL_PARTS = {
             'name' : 'Fencing Sword',
             'description' : 'T1 Attack',
             'type' : 'attack',
-            'damage' : 75
+            'damage' : 75,
+            'energy' : 50
+        },
+    'Spinning Blade' : {
+            'name' : 'Spinning Blade',
+            'description' : 'T2 Attack',
+            'type' : 'attack',
+            'damage' : 100,
+            'energy' : 100
+        },
+    'Red Laser' : {
+            'name' : 'Red Laser',
+            'description' : 'T3 Attack',
+            'type' : 'attack',
+            'damage' : 150,
+            'energy' : 250
+        },
+    
+    'Repair Nanites': {
+            'name' : 'Repair Nanites',
+            'description' : 'T1 Heal',
+            'type' : 'heal',
+            'healing' : 50,
+            'energy' : 50
+        },
+    'System Analysis': {
+        'name' : 'System Analysis',
+        'description' : 'T2 Heal',
+        'type' : 'heal',
+        'healing' : 75,
+            'energy' : 100
+    },
+    'Reboot': {
+        'name' : 'Reboot',
+        'description' : 'T3 Heal',
+        'type' : 'heal',
+        'healing' : 100,
+            'energy' : 250
+    },
+
+    'Raise Shield':{
+            'name' : 'Raise Shield',
+            'description' : 'T1 Block',
+            'type' : 'block',
+            'guard' : 50
+        },
+    'Energy Shields':{
+            'name' : 'Energy Shields',
+            'description' : 'T2 Block',
+            'type' : 'block',
+            'guard' : 50,
+            'energy' : 100
+        },
+
+
+    'Guard':{
+            'name' : 'Guard',
+            'description' : 'Taunt foes, until end of combat, or bot dies. While taunted, foes can only attack bots that have taunted.',
+            'type' : 'Special',
+            'energy' : 100
+        },
+    'Repair Nanite Swarm':{
+            'name' : 'Repair Nanite Swarm',
+            'description' : 'Heal all friendly bots',
+            'type' : 'Special',
+            'energy' : 250
+        },
+    
+    'Rally':{
+            'name' : 'Rally',
+            'description' : 'buff friendly bot attacks for rest of comabt',
+            'type' : 'Special',
+            'energy' : 100
+        },
+    'Crusher':{
+            'name' : 'Crusher',
+            'description' : 'Sacrifice friendly bot, deal damage equal to scrap value of sacrificed bot',
+            'type' : 'Special',
+            'energy' : 0
         }
 }
 def apply_part(new_part, this_bot, isplayer):
     global ALL_PARTS
-    if new_part == 'Fencing Sword':
-        this_bot['parts']['Fencing Sword'] = ALL_PARTS[new_part]
-    elif new_part == 'Spinning Blade':
-        this_bot['parts']['Spinning Blade'] = {
-            'name' : 'Spinning Blade',
-            'description' : 'T2 Attack',
-            'type' : 'attack',
-            'damage' : 100
-        }
-    elif new_part == 'Red Laser':
-        this_bot['parts']['Red Laser'] = {
-            'name' : 'Red Laser',
-            'description' : 'T3 Attack',
-            'type' : 'attack',
-            'damage' : 150
-        }
-    
-
-    elif new_part == 'Repair Nanites':
-        this_bot['parts']['Repair Nanites'] = {
-            'name' : 'Repair Nanites',
-            'description' : 'T1 Heal',
-            'type' : 'heal',
-            'healing' : 100
-        }
-    elif new_part == 'System Analysis':
-        this_bot['parts']['System Analysis'] = {
-        'name' : 'System Analysis',
-        'description' : 'T2 Heal',
-        'type' : 'heal',
-        'healing' : 150
-    }
-    elif new_part == 'Reboot':
-        this_bot['parts']['Reboot'] = {
-        'name' : 'Reboot',
-        'description' : 'T3 Heal',
-        'type' : 'heal',
-        'healing' : 200
-    }
-
-
-    elif new_part == 'Raise Shield':
-        this_bot['parts']['Raise Shield'] = {
-            'name' : 'Raise Shield',
-            'description' : 'T1 Block',
-            'type' : 'block',
-            'guard' : 25
-        }
-    elif new_part == 'Energy Shields':
-        this_bot['parts']['Energy Shields'] = {
-            'name' : 'Energy Shields',
-            'description' : 'T2 Block',
-            'type' : 'block',
-            'guard' : 50
-        }
-
-
-    elif new_part == 'Guard':
-        this_bot['parts']['Guard'] = {
-            'name' : 'Guard',
-            'description' : 'Taunt foes, until end of combat, or bot dies. While taunted, foes can only attack bots that have taunted.',
-            'type' : 'Special',
-        }
-    elif new_part == 'Repair Nanite Swarm':
-        this_bot['parts']['Repair Nanite Swarm'] = {
-            'name' : 'Repair Nanite Swarm',
-            'description' : 'Heal all friendly bots',
-            'type' : 'Special',
-        }
-    
-    elif new_part == 'Rally':
-        this_bot['parts']['Rally'] = {
-            'name' : 'Rally',
-            'description' : 'buff friendly bot attacks for rest of comabt',
-            'type' : 'Special',
-        }
-    elif new_part == 'Crusher':
-        this_bot['parts']['Crusher'] = {
-            'name' : 'Crusher',
-            'description' : 'Sacrifice friendly bot, deal damage equal to scrap value of sacrificed bot',
-            'type' : 'Special',
-        }
-
-    else:
-        print(f'Error in function: apply_part, {new_part}part not in list')
-    # print only when player using
     if isplayer:
-        print('Success')
-        bot_name = this_bot['parts'][new_part]['name']
-        bot_description = this_bot['parts'][new_part]['description']
-        print('part info:')
-        if this_bot['parts'][new_part]['type'] == 'Special':
-            print(f'{bot_name} will {bot_description}')
+        if ALL_PARTS[new_part]['energy'] <= player_bots[this_bot]['energy']:
+            player_bots[this_bot]['energy'] -= ALL_PARTS[new_part]['energy']
+            print('Success')
+            bot_name = this_bot['parts'][new_part]['name']
+            bot_description = this_bot['parts'][new_part]['description']
+            print('part info:')
+            if this_bot['parts'][new_part]['type'] == 'Special':
+                print(f'{bot_name} will {bot_description}')
+            else:
+                print(f'{bot_name} is a {bot_description}')
+            time.sleep(1)
         else:
-            print(f'{bot_name} is a {bot_description}')
-        time.sleep(1)
+            print('Not enough Watts avalible in bot, consider building bots with better "cores"')
+    else:
+        this_bot['parts'][new_part] = ALL_PARTS[new_part]
     # end of Apply Part
 def random_utility(team):
     '''Generates a random utility part from list'''
     utilities = [
         'Repair Nanites', 'Raise Shield', 'Reboot', 'Energy Shields', 'System Analysis', 'Guard', 'Repair Nanite Swarm'
     ]
+    global ALL_PARTS
     rand = random.randint(1, 23)
     if rand < 5:
         rand = utilities[0]
@@ -546,10 +548,12 @@ def random_utility(team):
     
     if team == 'player':
         print(f'You got a: {rand}')
+        print(f'{ALL_PARTS[rand]["description"]}')
     return rand
     # End of random utility
 def random_weapon(team):
     '''Generates a random weapon part from list'''
+    global ALL_PARTS
     weapons = [
         'Fencing Sword', 'Spinning Blade', 'Red Laser'
     ]
@@ -563,10 +567,12 @@ def random_weapon(team):
 
     if team == 'player':
         print(f'You got a: {rand}')
+        print(f'{ALL_PARTS[rand]["description"]}')
     return rand
     # End of random Weapon
 def random_champion(team):
     '''Generates a random Champion part from list'''
+    global ALL_PARTS
     utilities = [
         'Crusher', 'Rally'
     ]
@@ -578,6 +584,7 @@ def random_champion(team):
     
     if team == 'player':
         print(f'You got a: {rand}')
+        print(f'{ALL_PARTS[rand]["description"]}')
     return rand
     # End of random champion
 
@@ -864,7 +871,7 @@ def summon_this_agro_bot(bot_cr):
         rand = str(random.randint(1, counter))
         
     agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
-    bot_cr -= bot_core_dict[rand]['cost']
+    # bot_cr -= bot_core_dict[rand]['cost']
     agro_bots[name]['energy'] = bot_core_dict[rand]['energy']
     bot_cr += 5 # Ensure bot has at least enough CR to build full bot
 
@@ -881,7 +888,7 @@ def summon_this_agro_bot(bot_cr):
     elif agro_bots[name]['specialty'] == 'Defender':
         agro_bots[name]['max_hp'] = agro_bots[name]['max_hp'] * 2
         agro_bots[name]['hp'] = agro_bots[name]['hp'] * 2
-        agro_bots[name]['armor'] = agro_bots[name]['armor'] + 10
+        agro_bots[name]['armor'] = agro_bots[name]['armor'] + 50
 
     # - - parts
     if agro_bots[name]['specialty'] == 'Champion': # If bot is champ give it another part
@@ -963,6 +970,9 @@ def player_turn():
     print()
     time.sleep(0.5)
     for character in player_bots:
+        if not agro_bots:
+            return
+
         time.sleep(0.2)
         foelist = []
         for foe in agro_bots:
@@ -1040,23 +1050,25 @@ def part_use(myteam, yourteam, user, part):
     part_stats = myteam[user]['parts'][part]
     if part_stats['type'] == 'attack':
         target = targeting_ability(myteam, yourteam, False)
-
-        damage = part_stats['damage']
-        damage += damage * myteam[user]['power'] / 100 
-        
-        if myteam == player_bots:
-            damage += damage_modifications['player add']
-            damage *= damage_modifications['player mult']
-        else:
-            damage += damage_modifications['corrupt add']
-            damage *= damage_modifications['player mult']
-
-        damage -= yourteam[target]['armor']
-        if 'guard' in yourteam[target]:
-            damage -= yourteam[target]['guard']
-        yourteam[target]['hp'] -= damage
-        print(f'{user} attacks {target} for {damage:.1f} damage.')
-        check_life(yourteam, target)
+        if target != False:
+            damage = part_stats['damage']
+            damage = damage * myteam[user]['power'] / 100 
+            if myteam == player_bots:
+                damage += damage_modifications['player add']
+                damage *= damage_modifications['player mult']
+            else:
+                damage += damage_modifications['corrupt add']
+                damage *= damage_modifications['player mult']
+            damage -= yourteam[target]['armor']
+            if 'guard' in yourteam[target]:
+                damage -= yourteam[target]['guard']
+            if damage <= 0:
+                damage = 0
+                print(f'{user} attacks {target}, but it doesn\'t do any damage')
+            else:
+                yourteam[target]['hp'] -= damage
+                print(f'{user} attacks {target} for {damage:.1f} damage.')
+                check_life(yourteam, target)
 
     elif part_stats['type'] == 'heal':
         heal = part_stats['healing']
@@ -1152,7 +1164,8 @@ def targeting_ability(myteam, yourteam, target_my_team):
                     if turn:
                         print(f"{counter} : {bot}")
             else:
-                print('But it failed')
+                print('However there was nothing to hit.')
+                return False
 
     # After target options are declared
     while True:
@@ -1212,7 +1225,7 @@ player_name = input('What is your name: ')
 # ----------------------------------------------Save data----------------------------------------------#
 # - - Paste here - - then set load save to True - -
 game_time = {'day': 1, 'hour': 15, 'sleep': 2}
-player_bots = {'rick': {'name': 'rick', 'max_hp': 250, 'hp': 250, 'armor': 15, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 1000, 'hp': 1000, 'armor': 35, 'power': 20, 'energy': 50, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 250, 'hp': 250, 'armor': 15, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 150}}, 'scrap value': 455}}
+player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 50, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
 scrap = 600
 utility_parts = []
 champion_parts = ['Crusher', 'Crusher']
