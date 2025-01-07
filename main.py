@@ -309,7 +309,7 @@ def install_part():
     while True:
         pick_bot = True
         while pick_bot:
-            print("Pick a robot, or type 'quit' to quit (Capitalisation matters)")
+            print("Pick a robot, or type 'quit' to quit")
             counter = 1
             bot_list = []
             for bot in player_bots:
@@ -323,7 +323,7 @@ def install_part():
                     question = bot_list[question]
                 else:
                     print('number not in range \n')
-            elif question in ['quit', 'Quit', 'QUIT']:
+            elif question.lower() in 'quit':
                 return
             
             if question in player_bots:
@@ -582,7 +582,7 @@ def random_champion(team):
 def next_event():
     global game_time
     # Defualt event list (Always available)
-    events = ['Build bot']
+    events = ['Save Game', 'Build bot']
     # Conditional events
     if 20 < game_time['hour'] or game_time['hour'] < 4: 
         if not 8 < game_time['sleep']:
@@ -626,6 +626,12 @@ def next_event():
         print('You decide that you need more bots.')
         time.sleep(0.5)
         build_bot()
+    elif question == 'Save Game':
+        print('Saving...\n')
+        time.sleep(1)
+        save_game()
+        time.sleep(5)
+        print()
     elif question == 'Repair bots':
         repair_bots()
     elif question == 'Scavange for resources':
@@ -711,6 +717,21 @@ def list_bots():
     for bot in player_bots:
         names.append(player_bots[bot]['name'])
     return names
+
+def save_game():
+    global game_time
+    global player_bots
+    global scrap
+    global utility_parts
+    global champion_parts
+    global weapon_parts
+
+    print(f'game_time = {game_time}')
+    print(f'player_bots = {player_bots}')
+    print(f'scrap = {scrap}')
+    print(f'utility_parts = {utility_parts}')
+    print(f'champion_parts = {champion_parts}')
+    print(f'weapon_parts = {weapon_parts}')
 
 def repair_bots():
     global scrap
@@ -1179,54 +1200,54 @@ while True:
     else:
         print('Input must be either "1" "2", or "3"\n')
 player_name = input('What is your name: ')
-if player_name == 'E': # Remove this
-    player_bots ['Test Dummy'] = {
-        'name' : 'Test Dummy',
-        'max_hp' : 100,
-        'hp' : 100,
-        'armor' : 25,
-        'power' : 100,
-        'energy' : 100,
-        'specialty' : 'Striker',
-        'parts' : {
-            'Spinning Blade': {
-                'name' : 'Spinning Blade',
-                'description' : 'T2 Attack',
-                'type' : 'attack',
-                'damage' : 100
-            }
-        }
-    }
+
+
+# ----------------------------------------------Save data----------------------------------------------#
+# - - Paste here - - then set load save to True - -
+game_time = {'day': 1, 'hour': 14, 'sleep': 3}
+player_bots = {'rick': {'name': 'rick', 'max_hp': 250, 'hp': 250, 'armor': 15, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 1000, 'hp': 1000, 'armor': 35, 'power': 20, 'energy': 50, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 250, 'hp': 250, 'armor': 15, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 150}}, 'scrap value': 455}}
+scrap = 100
+utility_parts = []
+champion_parts = ['Crusher', 'Crusher']
+weapon_parts = []
+load_save = True
+
 # Introduction
-
-if player_exp == '1':
-    print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
-    time.sleep(2)
-    print('You have made it 50 miles deep into corrupted territory, Scrap sticks out of the scorched earth and flows down the rivers, life is still here, but only faintly.')
-    time.sleep(2)
-    print('You have to make your stand here, you set up camp, go to sleep, your elite team by your side, you are ready!')
-    time.sleep(2)
-    print('You wake up to see your force destroyed, a huge force has had a large battle last night.')
-    time.sleep(2)
-    print('You judge that this was the main army and all that could be left of this assault are smaller groups and their commander.')
-    time.sleep(2)
-    print('You check local energy readings. compaired to last night you have about 10 days until the commander arrives.')
-    time.sleep(2)
-    print('If you can take out the commander they will be too divided and disorginised for this assault to work.')
-    time.sleep(2)
-    print('You scrap the corrupted robots, you\'ll need all the materials you can get.\n')
-    time.sleep(2)
-gain_scrap(500)
-utility_parts.append(random_utility('player'))
-weapon_parts.append(random_weapon('player'))
-champion_parts.append(random_champion('player'))
-time.sleep(0.5)
-print('\nYour old force also needs to be put to use...')
-scavenge()
-scavenge()
-
-if player_exp == '1':
-    print('Your bots were just wreaked, you should build a bot quickly before you get attacked so you can defend yourself.')
+if load_save:
+    print()
+    print('Save data located.')
+    time.sleep(1)
+    print('Save loaded')
+    time.sleep(1)
+    print()
+else:
+    if player_exp == '1':
+        print(f'{player_name} you are a roboticist, you have been assigned to defend the city from the next swarm of corrupted robots.')
+        time.sleep(2)
+        print('You have made it 50 miles deep into corrupted territory, Scrap sticks out of the scorched earth and flows down the rivers, life is still here, but only faintly.')
+        time.sleep(2)
+        print('You have to make your stand here, you set up camp, go to sleep, your elite team by your side, you are ready!')
+        time.sleep(2)
+        print('You wake up to see your force destroyed, a huge force has had a large battle last night.')
+        time.sleep(2)
+        print('You judge that this was the main army and all that could be left of this assault are smaller groups and their commander.')
+        time.sleep(2)
+        print('You check local energy readings. compaired to last night you have about 10 days until the commander arrives.')
+        time.sleep(2)
+        print('If you can take out the commander they will be too divided and disorginised for this assault to work.')
+        time.sleep(2)
+        print('You scrap the corrupted robots, you\'ll need all the materials you can get.\n')
+        time.sleep(2)
+    gain_scrap(500)
+    utility_parts.append(random_utility('player'))
+    weapon_parts.append(random_weapon('player'))
+    champion_parts.append(random_champion('player'))
+    time.sleep(0.5)
+    print('\nYour old force also needs to be put to use...')
+    scavenge()
+    scavenge()
+    if player_exp == '1':
+        print('Your bots were just wreaked, you should build a bot quickly before you get attacked so you can defend yourself.')
 
 while main_loop:
     print(f'Your bots: {list_bots()}')
