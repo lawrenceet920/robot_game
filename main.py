@@ -356,6 +356,7 @@ def install_part():
                     print('No parts installed')
                 for part in selected_bot['parts']:
                     print(part)
+                print()
                 while installing:
                     print('Type in the part number you want to install, or "quit" to quit.')
                     print('Current owned parts:')
@@ -405,7 +406,7 @@ def install_part():
                                     installing = False
                         else:
                             print('Part not in range')
-                    elif question.lower == 'quit':
+                    elif question.lower() == 'quit':
                         installing = False
                     else:
                         print('part not found.')
@@ -415,15 +416,18 @@ def install_part():
     # End Of installing parts
 
 # - - - - - - - - - - - - - - - - - - - - -#-BOT PARTS! -#- - - - - - - - - - - - - - - - - - - - - #
-def apply_part(new_part, this_bot, isplayer):
-
-    if new_part == 'Fencing Sword':
-        this_bot['parts']['Fencing Sword'] = {
+ALL_PARTS = {
+    'Fencing Sword' : {
             'name' : 'Fencing Sword',
             'description' : 'T1 Attack',
             'type' : 'attack',
             'damage' : 75
         }
+}
+def apply_part(new_part, this_bot, isplayer):
+    global ALL_PARTS
+    if new_part == 'Fencing Sword':
+        this_bot['parts']['Fencing Sword'] = ALL_PARTS[new_part]
     elif new_part == 'Spinning Blade':
         this_bot['parts']['Spinning Blade'] = {
             'name' : 'Spinning Blade',
@@ -1141,11 +1145,14 @@ def targeting_ability(myteam, yourteam, target_my_team):
                 print('Pick a target for the attack.')
             counter = 0
             bot_list = []
-            for bot in yourteam:
-                counter += 1
-                bot_list.append(bot)
-                if turn:
-                    print(f"{counter} : {bot}")
+            if yourteam:
+                for bot in yourteam:
+                    counter += 1
+                    bot_list.append(bot)
+                    if turn:
+                        print(f"{counter} : {bot}")
+            else:
+                print('But it failed')
 
     # After target options are declared
     while True:
@@ -1204,9 +1211,9 @@ player_name = input('What is your name: ')
 
 # ----------------------------------------------Save data----------------------------------------------#
 # - - Paste here - - then set load save to True - -
-game_time = {'day': 1, 'hour': 14, 'sleep': 3}
+game_time = {'day': 1, 'hour': 15, 'sleep': 2}
 player_bots = {'rick': {'name': 'rick', 'max_hp': 250, 'hp': 250, 'armor': 15, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 1000, 'hp': 1000, 'armor': 35, 'power': 20, 'energy': 50, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 250, 'hp': 250, 'armor': 15, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 150}}, 'scrap value': 455}}
-scrap = 100
+scrap = 600
 utility_parts = []
 champion_parts = ['Crusher', 'Crusher']
 weapon_parts = []
