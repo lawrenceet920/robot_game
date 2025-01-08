@@ -343,8 +343,8 @@ def install_part():
         
         print(f"You are installing parts in: {question}. Specialty : {specialty}")
         total_parts = 0 # Find part count
-        if selected_bot['parts']: # Empty dict is false
-            for part in selected_bot['parts']:
+        if player_bots[selected_bot]['parts']: # Empty dict is false
+            for part in player_bots[selected_bot]['parts']:
                 total_parts += 1
         else:
             total_parts = 0
@@ -355,28 +355,28 @@ def install_part():
                 print("current installed parts:")
                 if not player_bots[selected_bot]['parts']:
                     print('No parts installed')
-                for part in selected_bot['parts']:
+                for part in player_bots[selected_bot]['parts']:
                     print(part)
                 print()
                 while installing:
                     print('Type in the part number you want to install, or "quit" to quit.')
                     energy = player_bots[selected_bot]['energy']
-                    print(f"Remaining energy: {energy}00 Watts")
+                    print(f"Remaining energy: {energy},000 Watts")
                     print('Current owned parts:')
                     counter = 1
                     part_list = []
                     for unused_part in weapon_parts:
-                        print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]}00 Watts')
+                        print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]},000 Watts')
                         part_list.append(unused_part)
                         counter += 1
                     for unused_part in utility_parts:
-                        print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]}00 Watts')
+                        print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]},000 Watts')
                         part_list.append(unused_part)
                         counter += 1
                     if champ: # List parts
                         print('\nChampion Part List: ')
                         for unused_part in champion_parts:
-                            print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]}00 Watts')
+                            print(f'{counter} : {unused_part} | {ALL_PARTS[unused_part]["energy"]},000 Watts')
                             part_list.append(unused_part)
                             counter += 1
                     # Stop listing
@@ -387,7 +387,7 @@ def install_part():
                         question = int(question) - 1
                         if -1 < question < len(part_list):
                             question = part_list[question]
-                            if question in selected_bot['parts']:
+                            if question in player_bots[selected_bot]['parts']:
                                 print('Part is already in the bot.')
                                 return
                             print('Part found! installing...')
@@ -511,14 +511,6 @@ def apply_part(new_part, this_bot, isplayer):
         if ALL_PARTS[new_part]['energy'] <= player_bots[this_bot]['energy']:
             player_bots[this_bot]['energy'] -= ALL_PARTS[new_part]['energy']
             print('Success')
-            bot_name = this_bot['parts'][new_part]['name']
-            bot_description = this_bot['parts'][new_part]['description']
-            print('part info:')
-            if this_bot['parts'][new_part]['type'] == 'Special':
-                print(f'{bot_name} will {bot_description}')
-            else:
-                print(f'{bot_name} is a {bot_description}')
-            time.sleep(1)
         else:
             print('Not enough Watts avalible in bot, consider building bots with better "cores"')
     else:
@@ -1225,7 +1217,7 @@ player_name = input('What is your name: ')
 # ----------------------------------------------Save data----------------------------------------------#
 # - - Paste here - - then set load save to True - -
 game_time = {'day': 1, 'hour': 15, 'sleep': 2}
-player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 50, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 50, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
+player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
 scrap = 600
 utility_parts = []
 champion_parts = ['Crusher', 'Crusher']
