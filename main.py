@@ -5,8 +5,11 @@ import time
 import random
 """Plan:
 Fight final boss
-Select special event (clone a bot, buff a bot, scrap pile, sell a bot, Theft, bot specific mission {drill part can mine})
-rest encounters?
+clone a bot
+buff a bot
+sell a bot
+Theft
+bot part specific mission
 """
 RANDOM_BOT_NAME_LIST = [
     'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster)', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer'
@@ -514,11 +517,12 @@ def apply_part(new_part, this_bot, isplayer):
     if isplayer:
         if ALL_PARTS[new_part]['energy'] <= player_bots[this_bot]['energy']:
             player_bots[this_bot]['energy'] -= ALL_PARTS[new_part]['energy']
+            player_bots[this_bot]['parts'][new_part] = ALL_PARTS[new_part]
             print('Success')
         else:
             print('Not enough Watts avalible in bot, consider building bots with better "cores"')
     else:
-        this_bot['parts'][new_part] = ALL_PARTS[new_part]
+        agro_bots[this_bot]['parts'][new_part] = ALL_PARTS[new_part]
     # end of Apply Part
 def random_utility(team):
     '''Generates a random utility part from list'''
@@ -543,8 +547,7 @@ def random_utility(team):
         rand = utilities[6]
     
     if team == 'player':
-        print(f'You got a: {rand}')
-        print(f'{ALL_PARTS[rand]["description"]}')
+        print(f'You got a: {rand} : {ALL_PARTS[rand]["description"]}')
     return rand
     # End of random utility
 def random_weapon(team):
@@ -562,8 +565,7 @@ def random_weapon(team):
         rand = weapons[2]
 
     if team == 'player':
-        print(f'You got a: {rand}')
-        print(f'{ALL_PARTS[rand]["description"]}')
+        print(f'You got a: {rand} : {ALL_PARTS[rand]["description"]}')
     return rand
     # End of random Weapon
 def random_champion(team):
@@ -579,8 +581,7 @@ def random_champion(team):
         rand = utilities[1]
     
     if team == 'player':
-        print(f'You got a: {rand}')
-        print(f'{ALL_PARTS[rand]["description"]}')
+        print(f'You got a: {rand} : {ALL_PARTS[rand]["description"]}')
     return rand
     # End of random champion
 
@@ -588,28 +589,32 @@ def random_champion(team):
 #- - - - - - - - - - - - - - - - - - - - -#-EVENT TRACKER-#- - - - - - - - - - - - - - - - - - - - -#
 def next_event():
     global game_time
+    get_time()
+
     # Defualt event list (Always available)
     events = ['Save Game', 'Build bot']
     # Conditional events
-    if 20 < game_time['hour'] or game_time['hour'] < 4: 
+    if 20 < game_time['hour'] or game_time['hour'] < 4: # Sleep (time based)
         if not 8 < game_time['sleep']:
             events.append('Sleep')
-    elif 0 > game_time['sleep']:
+    elif 0 > game_time['sleep']: # Sleep (exaustion based)
         events.append('Sleep')
-    if len(player_bots) >= 1:
+    if len(player_bots) >= 1: # Install parts
         events.append('Install bot parts')
-    for bot in player_bots:
+    for bot in player_bots: # Repair bots
         if player_bots[bot]['hp'] != player_bots[bot]['max_hp']:
             events.append('Repair bots')
             break
-    if random.randint(1,4) == 1:
+    
+    if game_time['hour'] == 12: # Salesman
+        events.append('Talk to salesman')
+    
+    if random.randint(1,4) == 1: # Fight or scavenge
         events.append('Scavange for resources')
     else:
         events.append('Fight')
-    if player_name == 'E':
-        events.append('wait')
 
-    get_time()
+    # --- ask user
     if 0 > game_time['sleep']:
         print('\nWhat now do you do now? I hopes its is sleeps')
     else:
@@ -633,6 +638,9 @@ def next_event():
         print('You decide that you need more bots.')
         time.sleep(0.5)
         build_bot()
+    elif question == 'Talk to salesman':
+        print('A strange salesman catches your eye, what are they doing out here?')
+        salesman()
     elif question == 'Save Game':
         print('Saving...\n')
         time.sleep(1)
@@ -656,8 +664,6 @@ def next_event():
         print('You prepare to install your bot parts.')
         time.sleep(0.5)
         install_part()
-    elif question == 'Wait':
-        print('Time passes by')
     elif question == 'Fight':
         print('You decide that you need more supplies.')
         time.sleep(0.5)
@@ -767,7 +773,12 @@ def repair_bots():
                 print('Please enter a valid number.')
         else:
             print('Please enter a number.')
-
+def salesman():
+    global player_bots
+    rand = random.randint(1, 3)
+    if rand == 1: # Sell bot
+        print('The salesman greets you, they claim they are from a neighbor.')
+        print('You are suspisous of this claim, but')
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
 '''    complete Bot example
     ## - Bots cannot have same name while they are acitively in agrobots (Because it is a dictonary)
@@ -889,9 +900,9 @@ def summon_this_agro_bot(bot_cr):
     # - - parts
     if agro_bots[name]['specialty'] == 'Champion': # If bot is champ give it another part
         bot_cr += 100
-    apply_part(get_agro_parts(name), agro_bots[name], False) # This part is here to ensure the bot can act
+    apply_part(get_agro_parts(name), name, False) # This part is here to ensure the bot can act
     while bot_cr > 99 and len(agro_bots[name]['parts']) < 5:
-        apply_part(get_agro_parts(name), agro_bots[name], False)
+        apply_part(get_agro_parts(name), agro_bots[name]['name'], False)
         bot_cr -= 100
 
 
