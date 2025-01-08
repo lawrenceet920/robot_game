@@ -982,8 +982,11 @@ def player_turn():
         print(f"It is {character}'s turn.")
         time.sleep(0.2)
         if 'guard' in player_bots[character]:
+            if player_bots[character]['guard'] == -10:
+                print(f'{character}\'s engine revs back up.')
+            else:
+                print(f'{character} lowers their guard.')
             del player_bots[character]['guard']
-            print(f'{character} lowers their guard.')
         if player_bots[character]['parts']:
             counter = 0
             parts = []
@@ -1022,8 +1025,11 @@ def agro_bots_turn():
         print('===========================')
         print(f"It is {character}'s turn.")
         if 'guard' in agro_bots[character]:
+            if agro_bots[character]['guard'] == -10:
+                print(f'{character}\'s engine revs back up.')
+            else:
+                print(f'{character} lowers their guard.')
             del agro_bots[character]['guard']
-            print(f'{character} lowers their guard.')
         parts = []
         for option in agro_bots[character]['parts']:
             parts.append(option)
@@ -1064,9 +1070,18 @@ def part_use(myteam, yourteam, user, part):
             else:
                 yourteam[target]['hp'] -= damage
                 print(f'{user} attacks {target} for {damage:.1f} damage.')
+
                 if yourteam[target]['power'] < damage: # This is a test
-                    print(f'{target}\'s engine couldn\'t hold against the attack, they are now vulnerable')
-                    yourteam[target]['guard'] = -10
+                    if 'guard' in yourteam[target]:
+                        if yourteam[target]['guard'] == -10:
+                            print(f'{target}\'s engines are still down, they couldn\'t defend themself.')
+                        else:
+                            print(f'{target}\'s engines failed, they are now vulnerable')
+                            yourteam[target]['guard'] = -10
+                    else:
+                            print(f'{target}\'s engines failed, they are now vulnerable')
+                            yourteam[target]['guard'] = -10
+                time.sleep(1)
                     
                 check_life(yourteam, target)
 
