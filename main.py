@@ -23,6 +23,7 @@ def gain_scrap(amount):
 
 def get_time():
     global game_time
+    global scrap
     # Add time
     game_time["hour"] += 1
     game_time["sleep"] -= 1
@@ -32,7 +33,8 @@ def get_time():
     time.sleep(0.5)
     # Tell Time
     print('\n******************************')
-    print(f'It is {game_time["hour"]}:00 on day {game_time["day"]}')
+    print(f'It is {game_time["hour"]}:00 on day {game_time["day"]}.')
+    print(f'You have {scrap} scrap.')
     if 8 < game_time['sleep']:
         print('You are well rested')
     elif 4 < game_time['sleep']:
@@ -106,14 +108,16 @@ def build_bot():
         bot_loadout['armor'] = bot_loadout['armor'] + 50
     bot_loadout['scrap value'] = cost
 
-    print(f"This robot specialises in {specialty} and is will use these parts")
+    print(f"This robot is a {specialty} and is will use these parts:")
     print(f"Chasis : {chasis['material']} | Core : {core['material']} | Engine : {engine['material']}")
-
     print(f'This bot will cost {cost} scrap to construct.')
+    time.sleep(0.5)
+    print()
+
     if scrap >= cost:
         print('Type y to build the robot.')
         question = input('Awaiting input: ')
-        if question in ['y', 'Y', 'Yes', 'yes']:
+        if question.lower() == 'y':
             player_bots[name] = bot_loadout
             scrap -= cost
             if player_exp != '3':
@@ -122,7 +126,7 @@ def build_bot():
             else:
                 print('Bot construction finished.')
     else: 
-        print('You do not have enough scrap to build this.')
+        print(f'You do not have enough scrap to build {name}.')
         time.sleep(1)
     print('Exiting build mode.')
     time.sleep(2)
@@ -699,9 +703,9 @@ def scavenge():
         question = input('Awaiting input: ')
         if question == '1':
             if 0 > game_time['sleep']:
-                gain_scrap(250)
+                gain_scrap(75)
             else:
-                gain_scrap(500)
+                gain_scrap(150)
             break
         elif question == '2':
             champion_parts.append(random_champion('player'))
@@ -1060,6 +1064,10 @@ def part_use(myteam, yourteam, user, part):
             else:
                 yourteam[target]['hp'] -= damage
                 print(f'{user} attacks {target} for {damage:.1f} damage.')
+                if yourteam[target]['power'] < damage: # This is a test
+                    print(f'{target}\'s engine couldn\'t hold against the attack, they are now vulnerable')
+                    yourteam[target]['guard'] = -10
+                    
                 check_life(yourteam, target)
 
     elif part_stats['type'] == 'heal':
@@ -1196,8 +1204,10 @@ damage_modifications = {
     'corrupt mult' : 1
 }
 turn = True # True is playerturn
+
+
 # Game start
-while True:
+while True:     # Enable which tutorials?
     print('How much have you played this game? (Enter the number to the left of the ":")')
     print('1 : Never, full tutorial')
     print('2 : Some, remove tutorials')
@@ -1212,7 +1222,6 @@ while True:
     else:
         print('Input must be either "1" "2", or "3"\n')
 player_name = input('What is your name: ')
-
 
 # ----------------------------------------------Save data----------------------------------------------#
 # - - Paste here - - then set load save to True - -
