@@ -12,7 +12,7 @@ Theft
 bot part specific mission
 """
 RANDOM_BOT_NAME_LIST = [
-    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster)', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer'
+    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer', 'The Omega Toaster Of DOOOOOOOOOOOOM', 'Brick', 'Volvo', 'OPC3'
 ]
 
 def gain_scrap(amount):
@@ -401,17 +401,14 @@ def install_part():
                             if champ:
                                 for part in champion_parts:
                                     if part == question:
-                                        champion_parts.remove(part)
                                         apply_part(part, selected_bot, True)
                                         installing = False
                             for part in utility_parts:
                                 if part == question:
-                                    utility_parts.remove(part)
                                     apply_part(part, selected_bot, True)
                                     installing = False
                             for part in weapon_parts:
                                 if part == question:
-                                    weapon_parts.remove(part)
                                     apply_part(part, selected_bot, True)
                                     installing = False
                         else:
@@ -518,6 +515,12 @@ def apply_part(new_part, this_bot, isplayer):
         if ALL_PARTS[new_part]['energy'] <= player_bots[this_bot]['energy']:
             player_bots[this_bot]['energy'] -= ALL_PARTS[new_part]['energy']
             player_bots[this_bot]['parts'][new_part] = ALL_PARTS[new_part]
+            if new_part in utility_parts:
+                utility_parts.remove(new_part)
+            elif new_part in weapon_parts:
+                weapon_parts.remove(new_part)
+            elif new_part in champion_parts:
+                champion_parts.remove(new_part)
             print('Success')
         else:
             print('Not enough Watts avalible in bot, consider building bots with better "cores"')
