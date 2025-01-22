@@ -5,14 +5,12 @@ import time
 import random
 """Plan:
 Fight final boss
-clone a bot
 buff a bot
-sell a bot
 Theft
 bot part specific mission
 """
 RANDOM_BOT_NAME_LIST = [
-    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer', 'The Omega Toaster Of DOOOOOOOOOOOOM', 'Brick', 'Volvo', 'OPC3'
+    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer', 'The Omega Toaster Of DOOOOOOOOOOOOM', 'Brick', 'Volvo', 'OPC3', 'Stoat', 'Leap Bot'
 ]
 
 def gain_scrap(amount):
@@ -458,7 +456,7 @@ ALL_PARTS = {
         'description' : 'T2 Heal',
         'type' : 'heal',
         'healing' : 75,
-            'energy' : 100
+        'energy' : 100
     },
     'Reboot': {
         'name' : 'Reboot',
@@ -472,7 +470,8 @@ ALL_PARTS = {
             'name' : 'Raise Shield',
             'description' : 'T1 Block',
             'type' : 'block',
-            'guard' : 50
+            'guard' : 50,
+            'energy' : 50
         },
     'Energy Shields':{
             'name' : 'Energy Shields',
@@ -778,10 +777,87 @@ def repair_bots():
             print('Please enter a number.')
 def salesman():
     global player_bots
-    rand = random.randint(1, 3)
+    global RANDOM_BOT_NAME_LIST
+    global scrap
+    # rand = random.randint(1, 3)
+    rand = 3
     if rand == 1: # Sell bot
-        print('The salesman greets you, they claim they are from a neighbor.')
-        print('You are suspisous of this claim, but')
+        print('The salesman greets you, wearing what they are you can tell they are successful.')
+        print('They request purchase a bot off you.')
+        print('As you are about to walk away he names his first price.')
+        print('You could build a new bot with that much scrap!')
+
+        # List Bots
+        counter = 1
+        for bot in player_bots:
+            print(f"{counter} : {player_bots[bot]['name']} : {player_bots[bot]['scrap value'] * 1.5}")
+            counter += 1
+
+        question = salesman_select()
+        if question == None:
+            return
+        
+        # Else if Bot Selected:
+        print('The Salesman excitedly grabs his new bot drops the scrap and hurries off.')
+        gain_scrap(player_bots[question]['scrap value'] * 1.5)
+        del player_bots[question]
+    elif rand == 2: # Clone bot
+        print('The salesman greets you, they are strolling a large tube with them.')
+        print('They claim they have recently developed a device that can scan and replicate bots!')
+        print('They offer to clone one of your bots, but you will have to pay for it.')
+
+        # List Bots
+        counter = 1
+        for bot in player_bots:
+            print(f"{counter} : {player_bots[bot]['name']} : {player_bots[bot]['scrap value'] + 250}")
+            counter += 1
+        question = salesman_select()
+        if question == None:
+            return
+        elif player_bots[question]['scrap value'] + 250 < scrap:
+            print('He looks at the bot and your pile of scrap...')
+            print('Sighs and walks away, You must not have had enough scrap.')
+            return
+        
+        while True:
+            name = input('Name the clone, or type "r" to use a random name:    ')
+            if name == 'r':
+                while True: # Generate random (Unused)name 
+                    name = RANDOM_BOT_NAME_LIST[random.randint(0, len(RANDOM_BOT_NAME_LIST) - 1)]
+                    if name not in player_bots:
+                        print(f'name chosen: {name}')
+                        break
+                break
+            elif name not in player_bots:
+                break
+            else:
+                print('Please use a unique name.')
+        loadout = player_bots[question]
+        loadout['name'] = name
+        player_bots[name] = loadout
+    elif rand == 3:
+        print()
+
+def salesman_select():
+    # Make botlist
+    counter = 1
+    bot_list = []
+    for bot in player_bots:
+        bot_list.append(bot)
+        counter += 1
+
+    print("Pick a robot, or type 'quit' to quit")
+    while True:
+        question = input('Awaiting input: ')
+        if question.isdigit():
+            question = int(question) - 1
+            if -1 < question < len(player_bots):
+                return bot_list[question]
+            else:
+                print('number not in range \n')
+        elif question.lower() in 'quit':
+            print('You walk away.')
+            return
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
 '''    complete Bot example
     ## - Bots cannot have same name while they are acitively in agrobots (Because it is a dictonary)
@@ -793,6 +869,7 @@ def salesman():
             'power' : 100,
             'energy' : 100,
             'specialty' : 'Striker',
+            'scrap value',
             'parts' : {
                 'Spinning Blade': {
                     'name' : 'Spinning Blade',
@@ -1252,16 +1329,16 @@ while True:     # Enable which tutorials?
         print('Input must be either "1" "2", or "3"\n')
 player_name = input('What is your name: ')
 
-# ----------------------------------------------Save data----------------------------------------------#
+# ------------------------Save data------------------------#
 # - - Paste here - - then set load save to True - -
-# game_time = {'day': 1, 'hour': 15, 'sleep': 2}
-# player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
-# scrap = 600
-# utility_parts = []
-# champion_parts = ['Crusher', 'Crusher']
-# weapon_parts = []
-load_save = False
-
+game_time = {'day': 1, 'hour': 15, 'sleep': 2}
+player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
+scrap = 600
+utility_parts = []
+champion_parts = ['Crusher', 'Crusher']
+weapon_parts = []
+load_save = True
+salesman()
 
 # Introduction
 if load_save:
