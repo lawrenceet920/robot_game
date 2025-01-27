@@ -3,12 +3,6 @@
 # Dec 13 2024
 import time
 import random
-"""Plan:
-Fight final boss
-buff a bot
-Theft
-bot part specific mission
-"""
 RANDOM_BOT_NAME_LIST = [
     'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer', 'The Omega Toaster Of DOOOOOOOOOOOOM', 'Brick', 'Volvo', 'OPC3', 'Stoat', 'Leap Bot'
 ]
@@ -100,7 +94,7 @@ def build_bot():
         'parts' : {}
     }
     if specialty == 'Swarmer':
-        cost -= cost / 2
+        cost -= cost / 3
     elif specialty == 'Striker':
         bot_loadout['power'] = bot_loadout['power'] * 1.5
     elif specialty == 'Defender':
@@ -609,7 +603,8 @@ def next_event():
             break
     
     if game_time['hour'] == 12: # Salesman
-        events.append('Talk to salesman')
+        if player_bots:
+            events.append('Talk to salesman')
     
     if random.randint(1,4) == 1: # Fight or scavenge
         events.append('Scavange for resources')
@@ -779,8 +774,7 @@ def salesman():
     global player_bots
     global RANDOM_BOT_NAME_LIST
     global scrap
-    # rand = random.randint(1, 3)
-    rand = 3
+    rand = random.randint(1, 3)
     if rand == 1: # Sell bot
         print('The salesman greets you, wearing what they are you can tell they are successful.')
         print('They request purchase a bot off you.')
@@ -814,7 +808,7 @@ def salesman():
         question = salesman_select()
         if question == None:
             return
-        elif player_bots[question]['scrap value'] + 250 < scrap:
+        elif player_bots[question]['scrap value'] + 250 > scrap:
             print('He looks at the bot and your pile of scrap...')
             print('Sighs and walks away, You must not have had enough scrap.')
             return
@@ -835,8 +829,57 @@ def salesman():
         loadout = player_bots[question]
         loadout['name'] = name
         player_bots[name] = loadout
-    elif rand == 3:
+    elif rand == 3: # Buff a bot
+        print('The salesman greets you, a large custom built bot behind.')
+        print('They silently look at your bots, "Quality work from such cheap material."')
+        print('For a moment you think they are about to ask for a bot built but-')
+        print('They offer to retrofit a bot with new material, the large bot drops a crate revealing parts only made in cities!')
+
+        rand = random.choice(['chasis', 'engine'])
+        PART_TYPES = {
+            'chasis' : {
+                'material' : 'Graphene',
+                'cost' : 500,
+                'armor' : 300,
+                'health' : 5000},
+            'engine' : {
+                'material' : 'Rocket',
+                'cost' : 750,
+                'power' : 400}
+        }
+
+        print(f"He offers for a sum of {PART_TYPES[rand]['cost']} scrap, he will install a {PART_TYPES[rand]['material']} {rand} into a bot of your choice.\n")
+        # List Bots
+        counter = 1
+        for bot in player_bots:
+            print(f"{counter} : {player_bots[bot]['name']}")
+            counter += 1
         print()
+        question = salesman_select()
+        if question == None:
+            return
+        elif PART_TYPES[rand]['cost'] > scrap:
+            print('He looks at the pile of scrap you present "Oh! That just isn\'t safe.out here."')
+            print('He offers you what he can spare, and dumps a pile of scrap into a bucket')
+            scavenge()
+            print('He wishes you great luck, and wanders off')
+            return
+        
+        # Purchased
+        scrap -= PART_TYPES[rand]['cost']
+        print('He grabs some stuff from his box and through an intense and confusing hour the part is installed.')
+        if rand == 0:
+            player_bots[question]['max_hp'] = PART_TYPES['chasis']['health'],
+            player_bots[question]['armor'] = PART_TYPES['chasis']['armor'],
+            if player_bots[question]['specialty'] == 'Defender':
+                player_bots[question]['max_hp'] = player_bots[question]['max_hp'] * 2
+                player_bots[question]['armor'] = player_bots[question]['armor'] + 50
+            print(f"{player_bots[question]['name']} looks like they could take an EMP")
+        else:
+            player_bots[question]['power'] = PART_TYPES['engine']['power'],
+            if player_bots[question]['specialty'] == 'Striker':
+                player_bots[question]['power'] = player_bots[question]['power'] * 1.5
+            print(f"{player_bots[question]['name']} looks like they could punch down steel")
 
 def salesman_select():
     # Make botlist
@@ -859,27 +902,6 @@ def salesman_select():
             print('You walk away.')
             return
 # - - - - - - - - - - - - - - - - - - - - -#- COMBAT -#- - - - - - - - - - - - - - - - - - - - - #
-'''    complete Bot example
-    ## - Bots cannot have same name while they are acitively in agrobots (Because it is a dictonary)
-    agro_bots['Blade Bot'] = {
-            'name' : 'Test Dummy',
-            'max_hp' : 100,
-            'hp' : 100,
-            'armor' : 25,
-            'power' : 100,
-            'energy' : 100,
-            'specialty' : 'Striker',
-            'scrap value',
-            'parts' : {
-                'Spinning Blade': {
-                    'name' : 'Spinning Blade',
-                    'description' : 'T2 Attack',
-                    'type' : 'attack',
-                    'damage' : 100
-                }
-            }
-        }
-'''
 # - - - - - build - - - - - #
 def summon_evil_bots():
     global game_time
@@ -985,7 +1007,32 @@ def summon_this_agro_bot(bot_cr):
         apply_part(get_agro_parts(name), agro_bots[name]['name'], False)
         bot_cr -= 100
 
-
+def final_boss():
+    # Battle Condition Check
+    while fighting:
+        turn = True
+        player_turn()
+        turn = False
+        print()
+        agro_bots_turn()
+        print()
+        if not agro_bots:
+            print('You Won. This nightmare is over.')
+            print('You can head back to the city and replace your old bots and rest.')
+            print('The city is safe after all!')
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            time.sleep(1)
+            print('\n\n\n\n\n')
+            fighting = False
+            main_loop = 'won'
+        elif not player_bots:
+            print('It is over. All that for nothing.')
+            print('You see the wreakage of your bots before you, this will not be the last scene like this from these bots.')
+            print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+            time.sleep(1)
+            print('\n\n\n\n\n')
+            fighting = False
+            main_loop = False
 # - - - - - Battle - - - - - #
 def get_agro_parts(name):
     if agro_bots[name]['specialty'] == 'Champion':
@@ -1380,6 +1427,11 @@ else:
 while main_loop:
     print(f'Your bots: {list_bots()}')
     next_event()
+    if game_time['day'] == 10:
+        print('You have been dreading this. They are here, win or lose this is the last battle.')
+        print('Whatever this commander is, it will not be easy.')
+        print('You look for it, clear as day they stand tall around the other bots.')
+
 time.sleep(1)
 print('Oh. oh no...')
 time.sleep(1)
