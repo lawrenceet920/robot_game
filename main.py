@@ -457,7 +457,7 @@ ALL_PARTS = {
         'description' : 'T3 Heal',
         'type' : 'heal',
         'healing' : 100,
-            'energy' : 250
+        'energy' : 250
     },
 
     'Raise Shield':{
@@ -486,6 +486,7 @@ ALL_PARTS = {
             'name' : 'Repair Nanite Swarm',
             'description' : 'Heal all friendly bots',
             'type' : 'Special',
+            'healing' : 45,
             'energy' : 250
         },
     
@@ -499,6 +500,13 @@ ALL_PARTS = {
             'name' : 'Crusher',
             'description' : 'Sacrifice friendly bot, deal damage equal to scrap value of sacrificed bot',
             'type' : 'Special',
+            'energy' : 0
+        },
+
+    'Repair Nanite Bomb':{
+            'name' : 'Repair Nanite Bomb',
+            'description' : 'Single use Max Heal',
+            'type' : 'item',
             'energy' : 0
         }
 }
@@ -1269,7 +1277,7 @@ def part_use(myteam, yourteam, user, part):
                 yourteam[target]['hp'] -= damage
                 print(f'{user} attacks {target} for {damage:.1f} damage.')
 
-                if yourteam[target]['power'] < damage: # This is a test
+                if yourteam[target]['power'] < damage:
                     if 'guard' in yourteam[target]:
                         if yourteam[target]['guard'] == -10:
                             print(f'{target}\'s engines are still down, they couldn\'t defend themself.')
@@ -1319,10 +1327,29 @@ def part_use(myteam, yourteam, user, part):
                 damage_modifications['player mult'] += 0.1
             else:
                 damage_modifications['corrupt mult'] += 0.1
+        elif part_stats['name'] == 'Repair Nanite Swarm':
+            print(f'A swarm of Repair Nanites excape from {myteam[user]['name']}')
+            heal = part_stats['healing']
+            heal = heal * myteam[user]['power'] / 100 
+            for team_member in myteam:
+                myteam[team_member]['hp'] += heal
+                if myteam[team_member]['hp'] > myteam[team_member]['max_hp']:
+                    myteam[team_member]['hp'] = myteam[team_member]['max_hp']
+            print(f'{user} heals all friendly bots for {heal:.1f} health.')
         else:
             print('This special part has no coded use yet! (sorry)')
-# End of part Use
 
+    elif part_stats['type'] == 'item':
+        if part_stats['name'] == 'Repair Nanite Bomb':
+            target = targeting_ability(myteam, yourteam, True)
+            myteam[target]['hp'] = myteam[target]['max_hp']
+            print(f'{user} heals {target} to full!.')
+        else:
+            print('This Item has no coded use yet! (sorry)')
+        del myteam[user]['parts'][part]
+
+# End of part Use
+    
 def check_life(team, character):
     if team[character]['hp'] < 1:
         print(f'{character} has been destroyed!')
