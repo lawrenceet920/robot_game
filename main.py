@@ -4,7 +4,7 @@
 import time
 import random
 RANDOM_BOT_NAME_LIST = [
-    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Iron Golem', 'Man of Tungsten', 'Blightsteel Destroyer', 'The Omega Toaster Of DOOOOOOOOOOOOM', 'Brick', 'Volvo', 'OPC3', 'Stoat', 'Leap Bot'
+    'Jim-bot', 'Mr bot', 'Super Robot', '2D-2R', 'Toaster', 'Tickle Me Elmo', 'Prof Cogsworth', 'Alan the Wrench', 'Cyber Bot', 'Cyborg', 'Android', 'Apple', 'Ton Meta', 'Golem of Iron', 'Man of Tungsten', 'Destroyer of Blightsteel', 'The Omega Toaster Of DOOOOOOOOOOOOM', 'Brick', 'Volvo', '3OP', 'Stoat', 'Leap Bot', 'Dull laptop', 'Incomplete Turing Machine', 'Forward Scout', 'Copper Construct', 'Flower Robot', 'bertBob', 'Nahte', 'Roboty', 'TV', 'Remote', 'Pumpkin 2.0', 'Craig The Broken'
 ]
 
 def gain_scrap(amount):
@@ -916,7 +916,6 @@ def summon_evil_bots():
     while agro_count != 0:
         summon_this_agro_bot(challenge_rating)
         agro_count -= 1
-
 def summon_this_agro_bot(bot_cr):
     global chasis_dict
     global bot_core_dict
@@ -1007,7 +1006,68 @@ def summon_this_agro_bot(bot_cr):
         apply_part(get_agro_parts(name), agro_bots[name]['name'], False)
         bot_cr -= 100
 
+def summon_boss():
+    global agro_bots
+    agro_bots = {
+        'Commander Prime of the Expantion Division': {
+            'name': 'Commander Prime of the Expantion Division', 
+            'max_hp': 2500, 
+            'hp': 2500, 
+            'armor': 250, 
+            'power': 250, 
+            'energy': 9550, 
+            'specialty': 'Champion', 
+            'parts': {'Rally': {'name': 'Rally', 'description': 'buff friendly bot attacks for rest of comabt', 'type': 'Special', 'energy': 100}, 
+            'Red Laser' : {'name' : 'Red Laser', 'description' : 'T3 Attack','type' : 'attack', 'damage' : 150, 'energy' : 250}},
+            'scrap value': 1850}, 
+            
+        'Guard Prime : Class Shield': {
+            'name': 'Guard Prime : Class Shield', 
+            'max_hp': 5000, 
+            'hp': 5000, 
+            'armor': 300, 
+            'power': 100, 
+            'energy': 10000, 
+            'specialty': 'Defender', 
+            'parts': {'Guard':{'name' : 'Guard', 'description' : 'Taunt foes, until end of combat, or bot dies. While taunted, foes can only attack bots that have taunted.', 'type' : 'Special', 'energy' : 100}, 'Energy Shields':{ 'name' : 'Energy Shields', 'description' : 'T2 Block', 'type' : 'block', 'guard' : 50, 'energy' : 100}}, 
+            'scrap value': 1200}, 
+            
+        'Guard Secunde : Class Halberd': {
+            'name': 'Guard Secunde : Class Halberd', 
+            'max_hp': 1, 
+            'hp': 1, 
+            'armor': 300, 
+            'power': 375.0, 
+            'energy': 10000, 
+            'specialty': 'Striker',  
+            'parts': {'Red Laser' : {'name' : 'Red Laser', 'description' : 'T3 Attack', 'type' : 'attack', 'damage' : 150, 'energy' : 250}}, 
+            'scrap value': 1500}, 
+            
+        'Guard Tertie : Class Shortsword': {
+            'name': 'Guard Tertie : Class Shortsword', 
+            'max_hp': 750, 
+            'hp': 750, 
+            'armor': 150, 
+            'power': 150, 
+            'energy': 450, 
+            'specialty': 'Swarmer', 
+            'parts': {'Repair Nanites': {'name': 'Repair Nanites', 'description': 'T1 Heal', 'type': 'heal', 'healing': 50, 'energy': 50}, 'Spinning Blade' : { 'name' : 'Spinning Blade', 'description' : 'T2 Attack', 'type' : 'attack', 'damage' : 100, 'energy' : 100}}, 
+            'scrap value': 533.3333333333333}}
 def final_boss():
+    global damage_modifications
+    global turn
+    global taunt_list
+    print('\n\n\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+    taunt_list = {}
+    print('Combat has started')
+    # Ensure player has bots
+    global main_loop
+    if player_bots:
+        fighting = True
+        summon_boss()
+    else:
+        fighting = False
+        main_loop = False
     # Battle Condition Check
     while fighting:
         turn = True
@@ -1378,14 +1438,13 @@ player_name = input('What is your name: ')
 
 # ------------------------Save data------------------------#
 # - - Paste here - - then set load save to True - -
-game_time = {'day': 1, 'hour': 15, 'sleep': 2}
-player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
-scrap = 600
-utility_parts = []
-champion_parts = ['Crusher', 'Crusher']
-weapon_parts = []
-load_save = True
-salesman()
+# game_time = {'day': 1, 'hour': 15, 'sleep': 2}
+# player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
+scrap = 100000
+# utility_parts = []
+# champion_parts = ['Crusher', 'Crusher']
+# weapon_parts = []
+load_save = False
 
 # Introduction
 if load_save:
@@ -1432,10 +1491,11 @@ while main_loop:
         print('Whatever this commander is, it will not be easy.')
         print('You look for it, clear as day they stand tall around the other bots.')
 
-time.sleep(1)
-print('Oh. oh no...')
-time.sleep(1)
-if 0 > game_time['sleep']:
-    print('Nap tiimeee-.')
-else:
-    print('Game over!')
+if main_loop != 'won':
+    time.sleep(1)
+    print('Oh. oh no...')
+    time.sleep(1)
+    if 0 > game_time['sleep']:
+        print('Nap tiimeee-.')
+    else:
+        print('Game over!')
