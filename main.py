@@ -423,7 +423,8 @@ ALL_PARTS = {
             'type' : 'attack',
             'damage' : 75,
             'energy' : 50,
-            'part type' : 'weapon'
+            'part type' : 'weapon',
+            'rarity' : 1
         },
     'Spinning Blade' : {
             'name' : 'Spinning Blade',
@@ -431,7 +432,8 @@ ALL_PARTS = {
             'type' : 'attack',
             'damage' : 100,
             'energy' : 100,
-            'part type' : 'weapon'
+            'part type' : 'weapon',
+            'rarity' : 2
         },
     'Red Laser' : {
             'name' : 'Red Laser',
@@ -439,7 +441,8 @@ ALL_PARTS = {
             'type' : 'attack',
             'damage' : 150,
             'energy' : 250,
-            'part type' : 'weapon'
+            'part type' : 'weapon',
+            'rarity' : 3
         },
     
     'Repair Nanites': {
@@ -448,7 +451,8 @@ ALL_PARTS = {
             'type' : 'heal',
             'healing' : 50,
             'energy' : 50,
-            'part type' : 'utility'
+            'part type' : 'utility',
+            'rarity' : 1
         },
     'System Analysis': {
         'name' : 'System Analysis',
@@ -456,7 +460,8 @@ ALL_PARTS = {
         'type' : 'heal',
         'healing' : 75,
         'energy' : 100,
-            'part type' : 'utility'
+        'part type' : 'utility',
+        'rarity' : 2
     },
     'Reboot': {
         'name' : 'Reboot',
@@ -464,7 +469,8 @@ ALL_PARTS = {
         'type' : 'heal',
         'healing' : 100,
         'energy' : 250,
-        'part type' : 'utility'
+        'part type' : 'utility',
+        'rarity' : 3
     },
 
     'Raise Shield':{
@@ -473,7 +479,8 @@ ALL_PARTS = {
             'type' : 'block',
             'guard' : 50,
             'energy' : 50,
-            'part type' : 'utility'
+            'part type' : 'utility',
+            'rarity' : 1
         },
     'Energy Shields':{
             'name' : 'Energy Shields',
@@ -481,39 +488,43 @@ ALL_PARTS = {
             'type' : 'block',
             'guard' : 50,
             'energy' : 100,
-            'part type' : 'utility'
+            'part type' : 'utility',
+            'rarity' : 2
         },
-
 
     'Guard':{
             'name' : 'Guard',
             'description' : 'Taunt foes, until end of combat, or bot dies. While taunted, foes can only attack bots that have taunted.',
             'type' : 'Special',
             'energy' : 100,
-            'part type' : 'utility'
+            'part type' : 'utility',
+            'rarity' : 1
         },
+
     'Repair Nanite Swarm':{
             'name' : 'Repair Nanite Swarm',
             'description' : 'Heal all friendly bots',
             'type' : 'Special',
             'healing' : 45,
             'energy' : 250,
-            'part type' : 'utility'
-        },
-    
+            'part type' : 'champion',
+            'rarity' : 2
+        }, 
     'Rally':{
             'name' : 'Rally',
             'description' : 'buff friendly bot attacks for rest of comabt',
             'type' : 'Special',
             'energy' : 100,
-            'part type' : 'champion'
+            'part type' : 'champion',
+            'rarity' : 3
         },
     'Crusher':{
             'name' : 'Crusher',
             'description' : 'Sacrifice friendly bot, deal damage equal to scrap value of sacrificed bot',
             'type' : 'Special',
             'energy' : 0,
-            'part type' : 'champion'
+            'part type' : 'champion',
+            'rarity' : 1
         },
 
     'Repair Nanite Bomb':{
@@ -521,7 +532,8 @@ ALL_PARTS = {
             'description' : 'Single use Max Heal',
             'type' : 'item',
             'energy' : 0,
-            'part type' : 'utility'
+            'part type' : 'utility',
+            'rarity' : 3
         }
 }
 def apply_part(new_part, this_bot, isplayer):
@@ -546,8 +558,18 @@ def random_part(team, part_type):
     '''Generates a random utility part from list'''
     global ALL_PARTS
     potential_parts = []
+    # Find Rarity
+    rarity = random.randint(1, 100)
+    if rarity <= 40:
+        rarity = 1
+    elif rarity <= 75:
+        rarity = 2
+    else:
+        rarity = 3
+
+    # List parts
     for part in ALL_PARTS.keys():
-        if ALL_PARTS[part]['part type'] == part_type:
+        if ALL_PARTS[part]['part type'] == part_type and ALL_PARTS[part]['rarity'] == rarity:
             potential_parts.append(part)
 
     rand = random.randint(0, len(potential_parts)-1)
@@ -1435,13 +1457,13 @@ player_name = input('What is your name: ')
 
 # ------------------------Save data------------------------#
 # - - Paste here - - then set load save to True - -
-game_time = {'day': 1, 'hour': 15, 'sleep': 2}
-player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
-scrap = 600
-utility_parts = []
-champion_parts = ['Crusher', 'Crusher']
-weapon_parts = []
-load_save = True
+# game_time = {'day': 1, 'hour': 15, 'sleep': 2}
+# player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
+# scrap = 600
+# utility_parts = []
+# champion_parts = ['Crusher', 'Crusher']
+# weapon_parts = []
+load_save = False
 
 # Introduction
 if load_save:
