@@ -130,7 +130,7 @@ def build_bot():
     # End of build bot
 # Selecting bot parts
 
-chasis_dict = {
+BOT_CHASSIS = {
     '1' : {
         'material' : 'Wooden',
         'cost' : 50,
@@ -169,28 +169,28 @@ chasis_dict = {
     }
     }
 def select_chasis():
-    global chasis_dict
+    global BOT_CHASSIS
     print('Select a "Chasis", this will determine base defencive stats.')
-    for option in chasis_dict:
-        player_select = chasis_dict[option]
+    for option in BOT_CHASSIS:
+        player_select = BOT_CHASSIS[option]
         cost = player_select['cost']
         material = player_select['material']
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in chasis_dict:
+        if question in BOT_CHASSIS:
             chasis = {
-                'material' : chasis_dict[question]['material'],
-                'cost' : chasis_dict[question]['cost'],
-                'armor' : chasis_dict[question]['armor'],
-                'health' : chasis_dict[question]['health']
+                'material' : BOT_CHASSIS[question]['material'],
+                'cost' : BOT_CHASSIS[question]['cost'],
+                'armor' : BOT_CHASSIS[question]['armor'],
+                'health' : BOT_CHASSIS[question]['health']
             }
             return chasis
         else:
             print('Enter a number.')
     # End of select chasis
 
-bot_core_dict = {
+BOT_CORES = {
     '1' : {
         'material' : 'Copper Battery',
         'cost' : 5,
@@ -218,27 +218,27 @@ bot_core_dict = {
     }
     }
 def select_core():
-    global bot_core_dict
+    global BOT_CORES
     print('Select a "Core", this will determine avalible energy (Parts passively use energy).')
-    for option in bot_core_dict:
-        player_select = bot_core_dict[option]
+    for option in BOT_CORES:
+        player_select = BOT_CORES[option]
         cost = player_select['cost']
         material = player_select['material']
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in bot_core_dict:
+        if question in BOT_CORES:
             core = {
-                'material' : bot_core_dict[question]['material'],
-                'cost' : bot_core_dict[question]['cost'],
-                'energy' : bot_core_dict[question]['energy']
+                'material' : BOT_CORES[question]['material'],
+                'cost' : BOT_CORES[question]['cost'],
+                'energy' : BOT_CORES[question]['energy']
             }
             return core
         else:
             print('Enter a number.')
     # End of select core
 
-engine_dict = {
+BOT_ENGINES = {
     '1' : {
         'material' : 'Toy',
         'cost' : 5,
@@ -266,20 +266,20 @@ engine_dict = {
     }
     }
 def select_engine():
-    global engine_dict
+    global BOT_ENGINES
     print('Select a "Engine", this will determine attack and support stats.')
-    for option in engine_dict:
-        player_select = engine_dict[option]
+    for option in BOT_ENGINES:
+        player_select = BOT_ENGINES[option]
         cost = player_select['cost']
         material = player_select['material']
         print(f'{option} : {material} : {cost} Scrap')
     while True:
         question = input('Awaiting input: ')
-        if question in engine_dict:
+        if question in BOT_ENGINES:
             engine = {
-                'material' : engine_dict[question]['material'],
-                'cost' : engine_dict[question]['cost'],
-                'power' : engine_dict[question]['power'],
+                'material' : BOT_ENGINES[question]['material'],
+                'cost' : BOT_ENGINES[question]['cost'],
+                'power' : BOT_ENGINES[question]['power'],
             }
             return engine
         else:
@@ -917,9 +917,9 @@ def summon_evil_bots():
         summon_this_agro_bot(challenge_rating)
         agro_count -= 1
 def summon_this_agro_bot(bot_cr):
-    global chasis_dict
-    global bot_core_dict
-    global engine_dict
+    global BOT_CHASSIS
+    global BOT_CORES
+    global BOT_ENGINES
     global RANDOM_BOT_NAME_LIST
     while True: # Ensure unique bot name
         name = RANDOM_BOT_NAME_LIST[random.randint(0, len(RANDOM_BOT_NAME_LIST) - 1)]
@@ -932,8 +932,8 @@ def summon_this_agro_bot(bot_cr):
 
     # - - Chasis
     counter = 0
-    for option in chasis_dict:
-        if chasis_dict[option]['cost'] < bot_cr:
+    for option in BOT_CHASSIS:
+        if BOT_CHASSIS[option]['cost'] < bot_cr:
             counter += 1
         else:
             break
@@ -942,17 +942,17 @@ def summon_this_agro_bot(bot_cr):
     else:
         rand = str(random.randint(1, counter))
 
-    agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
-    bot_cr -= chasis_dict[rand]['cost']
-    agro_bots[name]['hp'] = chasis_dict[rand]['health']
-    agro_bots[name]['max_hp'] = chasis_dict[rand]['health']
-    agro_bots[name]['armor'] = chasis_dict[rand]['armor']
+    agro_bots[name]['scrap value'] += BOT_CHASSIS[rand]['cost']
+    bot_cr -= BOT_CHASSIS[rand]['cost']
+    agro_bots[name]['hp'] = BOT_CHASSIS[rand]['health']
+    agro_bots[name]['max_hp'] = BOT_CHASSIS[rand]['health']
+    agro_bots[name]['armor'] = BOT_CHASSIS[rand]['armor']
     bot_cr += 5 # Ensure bot has at least enough CR to build full bot
 
     # - - Engine
     counter = 0
-    for option in engine_dict:
-        if engine_dict[option]['cost'] < bot_cr:
+    for option in BOT_ENGINES:
+        if BOT_ENGINES[option]['cost'] < bot_cr:
             counter += 1
         else:
             break
@@ -961,15 +961,15 @@ def summon_this_agro_bot(bot_cr):
     else:
         rand = str(random.randint(1, counter))
         
-    agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
-    bot_cr -= engine_dict[rand]['cost']
-    agro_bots[name]['power'] = engine_dict[rand]['power']
+    agro_bots[name]['scrap value'] += BOT_CHASSIS[rand]['cost']
+    bot_cr -= BOT_ENGINES[rand]['cost']
+    agro_bots[name]['power'] = BOT_ENGINES[rand]['power']
     bot_cr += 5 # Ensure bot has at least enough CR to build full bot
 
     # - - Core
     counter = 0
-    for option in bot_core_dict:
-        if bot_core_dict[option]['cost'] < bot_cr:
+    for option in BOT_CORES:
+        if BOT_CORES[option]['cost'] < bot_cr:
             counter += 1
         else:
             break
@@ -978,9 +978,9 @@ def summon_this_agro_bot(bot_cr):
     else:
         rand = str(random.randint(1, counter))
         
-    agro_bots[name]['scrap value'] += chasis_dict[rand]['cost']
-    # bot_cr -= bot_core_dict[rand]['cost']
-    agro_bots[name]['energy'] = bot_core_dict[rand]['energy']
+    agro_bots[name]['scrap value'] += BOT_CHASSIS[rand]['cost']
+    # bot_cr -= BOT_CORES[rand]['cost']
+    agro_bots[name]['energy'] = BOT_CORES[rand]['energy']
     bot_cr += 5 # Ensure bot has at least enough CR to build full bot
 
     # - - Specialty
