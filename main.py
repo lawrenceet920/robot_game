@@ -16,12 +16,13 @@ def gain_scrap(amount):
         print(f'+ {amount} scrap | you now have {scrap}')
     # End of gain scrap
 
-def get_time():
+def get_time(pass_time=True):
     global game_time
     global scrap
     # Add time
-    game_time["hour"] += 1
-    game_time["sleep"] -= 1
+    if pass_time:
+        game_time["hour"] += 1
+        game_time["sleep"] -= 1
     if game_time["hour"] == 25:
         game_time['day'] += 1
         game_time["hour"] = 1
@@ -43,7 +44,7 @@ def get_time():
     # End of get time
         
 
-# - - - - - - - - - - - - - - - - - - - - -#- BUILD BOT -#- - - - - - - - - - - - - - - - - - - - - #
+# - - - - - - - - - - - - - - - - - -#- BUILD BOT -#- - - - - - - - - - - - - - - - - - #
 
 def build_bot():
     global RANDOM_BOT_NAME_LIST
@@ -421,21 +422,24 @@ ALL_PARTS = {
             'description' : 'T1 Attack',
             'type' : 'attack',
             'damage' : 75,
-            'energy' : 50
+            'energy' : 50,
+            'part type' : 'weapon'
         },
     'Spinning Blade' : {
             'name' : 'Spinning Blade',
             'description' : 'T2 Attack',
             'type' : 'attack',
             'damage' : 100,
-            'energy' : 100
+            'energy' : 100,
+            'part type' : 'weapon'
         },
     'Red Laser' : {
             'name' : 'Red Laser',
             'description' : 'T3 Attack',
             'type' : 'attack',
             'damage' : 150,
-            'energy' : 250
+            'energy' : 250,
+            'part type' : 'weapon'
         },
     
     'Repair Nanites': {
@@ -443,21 +447,24 @@ ALL_PARTS = {
             'description' : 'T1 Heal',
             'type' : 'heal',
             'healing' : 50,
-            'energy' : 50
+            'energy' : 50,
+            'part type' : 'utility'
         },
     'System Analysis': {
         'name' : 'System Analysis',
         'description' : 'T2 Heal',
         'type' : 'heal',
         'healing' : 75,
-        'energy' : 100
+        'energy' : 100,
+            'part type' : 'utility'
     },
     'Reboot': {
         'name' : 'Reboot',
         'description' : 'T3 Heal',
         'type' : 'heal',
         'healing' : 100,
-        'energy' : 250
+        'energy' : 250,
+        'part type' : 'utility'
     },
 
     'Raise Shield':{
@@ -465,14 +472,16 @@ ALL_PARTS = {
             'description' : 'T1 Block',
             'type' : 'block',
             'guard' : 50,
-            'energy' : 50
+            'energy' : 50,
+            'part type' : 'utility'
         },
     'Energy Shields':{
             'name' : 'Energy Shields',
             'description' : 'T2 Block',
             'type' : 'block',
             'guard' : 50,
-            'energy' : 100
+            'energy' : 100,
+            'part type' : 'utility'
         },
 
 
@@ -480,34 +489,39 @@ ALL_PARTS = {
             'name' : 'Guard',
             'description' : 'Taunt foes, until end of combat, or bot dies. While taunted, foes can only attack bots that have taunted.',
             'type' : 'Special',
-            'energy' : 100
+            'energy' : 100,
+            'part type' : 'utility'
         },
     'Repair Nanite Swarm':{
             'name' : 'Repair Nanite Swarm',
             'description' : 'Heal all friendly bots',
             'type' : 'Special',
             'healing' : 45,
-            'energy' : 250
+            'energy' : 250,
+            'part type' : 'utility'
         },
     
     'Rally':{
             'name' : 'Rally',
             'description' : 'buff friendly bot attacks for rest of comabt',
             'type' : 'Special',
-            'energy' : 100
+            'energy' : 100,
+            'part type' : 'champion'
         },
     'Crusher':{
             'name' : 'Crusher',
             'description' : 'Sacrifice friendly bot, deal damage equal to scrap value of sacrificed bot',
             'type' : 'Special',
-            'energy' : 0
+            'energy' : 0,
+            'part type' : 'champion'
         },
 
     'Repair Nanite Bomb':{
             'name' : 'Repair Nanite Bomb',
             'description' : 'Single use Max Heal',
             'type' : 'item',
-            'energy' : 0
+            'energy' : 0,
+            'part type' : 'utility'
         }
 }
 def apply_part(new_part, this_bot, isplayer):
@@ -528,66 +542,21 @@ def apply_part(new_part, this_bot, isplayer):
     else:
         agro_bots[this_bot]['parts'][new_part] = ALL_PARTS[new_part]
     # end of Apply Part
-def random_utility(team):
+def random_part(team, part_type):
     '''Generates a random utility part from list'''
-    utilities = [
-        'Repair Nanites', 'Raise Shield', 'Reboot', 'Energy Shields', 'System Analysis', 'Guard', 'Repair Nanite Swarm'
-    ]
     global ALL_PARTS
-    rand = random.randint(1, 23)
-    if rand < 5:
-        rand = utilities[0]
-    elif rand < 10:
-        rand = utilities[1]
-    elif rand < 14:
-        rand = utilities[2]
-    elif rand < 18:
-        rand = utilities[3]
-    elif rand < 21:
-        rand = utilities[4]
-    elif rand < 23:
-        rand = utilities[5]
-    else:
-        rand = utilities[6]
+    potential_parts = []
+    for part in ALL_PARTS.keys():
+        if ALL_PARTS[part]['part type'] == part_type:
+            potential_parts.append(part)
+
+    rand = random.randint(0, len(potential_parts)-1)
+    rand = potential_parts[rand]
     
     if team == 'player':
         print(f'You got a: {rand} : {ALL_PARTS[rand]["description"]}')
     return rand
     # End of random utility
-def random_weapon(team):
-    '''Generates a random weapon part from list'''
-    global ALL_PARTS
-    weapons = [
-        'Fencing Sword', 'Spinning Blade', 'Red Laser'
-    ]
-    rand = random.randint(1, 10)
-    if rand < 5:
-        rand = weapons[0]
-    elif rand < 9:
-        rand = weapons[1]
-    else:
-        rand = weapons[2]
-
-    if team == 'player':
-        print(f'You got a: {rand} : {ALL_PARTS[rand]["description"]}')
-    return rand
-    # End of random Weapon
-def random_champion(team):
-    '''Generates a random Champion part from list'''
-    global ALL_PARTS
-    utilities = [
-        'Crusher', 'Rally'
-    ]
-    rand = random.randint(1, 2)
-    if rand < 2:
-        rand = utilities[0]
-    elif rand < 3:
-        rand = utilities[1]
-    
-    if team == 'player':
-        print(f'You got a: {rand} : {ALL_PARTS[rand]["description"]}')
-    return rand
-    # End of random champion
 
 # End of part listings
 #- - - - - - - - - - - - - - - - - - - - -#-EVENT TRACKER-#- - - - - - - - - - - - - - - - - - - - -#
@@ -719,21 +688,22 @@ def scavenge():
                 gain_scrap(150)
             break
         elif question == '2':
-            champion_parts.append(random_champion('player'))
+            champion_parts.append(random_part('player', 'champion'))
             break
         elif question == '3':
-            utility_parts.append(random_utility('player'))
+            utility_parts.append(random_part('player', 'utility'))
             break
         elif question == '4':
-            weapon_parts.append(random_weapon('player'))
+            weapon_parts.append(random_part('player', 'weapon'))
             break
         else:
             print('Invalid input, material 1, 2, 3 or 4.')
 def list_bots():
     global player_bots
     names = []
-    for bot in player_bots:
+    for bot in player_bots.keys():
         names.append(player_bots[bot]['name'])
+        print(f"{player_bots[bot]['name']} : {player_bots[bot]['hp']} / {player_bots[bot]['max_hp']}hp")
     return names
 
 def save_game():
@@ -1110,11 +1080,11 @@ def get_agro_parts(name):
     while True:
         bot_part = random.randint(1, reciver_is_champ)
         if int(bot_part) == 1:
-            bot_part = random_utility('agro')
+            bot_part = random_part('agro', 'utility')
         elif int(bot_part) <= 3:
-            bot_part = random_weapon('agro')
+            bot_part = random_part('agro', 'weapon')
         elif int(bot_part) > 3:
-            bot_part = random_champion('agro')
+            bot_part = random_part('agro', 'champion')
 
         if not bot_part in agro_bots[name]['parts']:
             break
@@ -1328,7 +1298,7 @@ def part_use(myteam, yourteam, user, part):
             else:
                 damage_modifications['corrupt mult'] += 0.1
         elif part_stats['name'] == 'Repair Nanite Swarm':
-            print(f'A swarm of Repair Nanites excape from {myteam[user]['name']}')
+            print(f'A swarm of Repair Nanites excape from {myteam[user]["name"]}')
             heal = part_stats['healing']
             heal = heal * myteam[user]['power'] / 100 
             for team_member in myteam:
@@ -1465,13 +1435,13 @@ player_name = input('What is your name: ')
 
 # ------------------------Save data------------------------#
 # - - Paste here - - then set load save to True - -
-# game_time = {'day': 1, 'hour': 15, 'sleep': 2}
-# player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
-scrap = 100000
-# utility_parts = []
-# champion_parts = ['Crusher', 'Crusher']
-# weapon_parts = []
-load_save = False
+game_time = {'day': 1, 'hour': 15, 'sleep': 2}
+player_bots = {'rick': {'name': 'rick', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Spinning Blade': {'name': 'Spinning Blade', 'description': 'T2 Attack', 'type': 'attack', 'damage': 100}, 'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}}, 'scrap value': 455}, 'bob': {'name': 'bob', 'max_hp': 2500, 'hp': 2500, 'armor': 250, 'power': 20, 'energy': 500, 'specialty': 'Defender', 'parts': {'Raise Shield': {'name': 'Raise Shield', 'description': 'T1 Block', 'type': 'block', 'guard': 25}}, 'scrap value': 360}, 'morty': {'name': 'morty', 'max_hp': 500, 'hp': 500, 'armor': 100, 'power': 225.0, 'energy': 500, 'specialty': 'Striker', 'parts': {'Fencing Sword': {'name': 'Fencing Sword', 'description': 'T1 Attack', 'type': 'attack', 'damage': 75}, 'System Analysis': {'name': 'System Analysis', 'description': 'T2 Heal', 'type': 'heal', 'healing': 75}}, 'scrap value': 455}}
+scrap = 600
+utility_parts = []
+champion_parts = ['Crusher', 'Crusher']
+weapon_parts = []
+load_save = True
 
 # Introduction
 if load_save:
@@ -1500,9 +1470,9 @@ else:
         print('You scrap the corrupted robots, you\'ll need all the materials you can get.\n')
         time.sleep(2)
     gain_scrap(500)
-    utility_parts.append(random_utility('player'))
-    weapon_parts.append(random_weapon('player'))
-    champion_parts.append(random_champion('player'))
+    utility_parts.append(random_part('player', 'utility'))
+    weapon_parts.append(random_part('player', 'weapon'))
+    champion_parts.append(random_part('player', 'champion'))
     time.sleep(0.5)
     print('\nYour old force also needs to be put to use...')
     scavenge()
@@ -1511,7 +1481,11 @@ else:
         print('Your bots were just wreaked, you should build a bot quickly before you get attacked so you can defend yourself.')
 
 while main_loop:
-    print(f'Your bots: {list_bots()}')
+    print('******************************')
+    print(f'Your bots:  ')
+    list_bots()
+    time.sleep(1)
+
     next_event()
     if game_time['day'] == 10:
         print('You have been dreading this. They are here, win or lose this is the last battle.')
