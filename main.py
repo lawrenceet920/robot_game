@@ -1150,6 +1150,14 @@ def combat_cycle():
             print('\n\n\n\n\n')
             fighting = False
             main_loop = False
+        for bot in player_bots:
+            if not player_bots[bot]['parts']:
+                print('Your bot\'s have no weapons')
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                time.sleep(1)
+                print('\n\n\n\n\n')
+                fighting = False
+                main_loop = False
     damage_modifications = {
     'player add' : 0,
     'player mult' : 1,
