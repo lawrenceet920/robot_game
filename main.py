@@ -1093,6 +1093,14 @@ def final_boss():
             print('\n\n\n\n\n')
             fighting = False
             main_loop = False
+        for bot in player_bots:
+            if not player_bots[bot]['parts']:
+                print('Your bot\'s have no weapons')
+                print('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+                time.sleep(1)
+                print('\n\n\n\n\n')
+                fighting = False
+                main_loop = False
 # - - - - - Battle - - - - - #
 def get_agro_parts(name):
     if agro_bots[name]['specialty'] == 'Champion':
